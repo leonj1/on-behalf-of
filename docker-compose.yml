@@ -12,12 +12,8 @@ services:
     ports:
       - "8080:8080"
     command: start-dev
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+    # Healthcheck removed - curl not available in container
+    # Health is checked from host in Makefile instead
     networks:
       - demo-network
 

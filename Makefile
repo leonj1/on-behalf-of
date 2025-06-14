@@ -3,7 +3,7 @@
 start:
 	docker compose up -d
 	@echo "Waiting for Keycloak to be ready..."
-	@until docker compose exec keycloak curl -sf http://localhost:8080/ > /dev/null; do \
+	@until curl -sf http://localhost:8080/ > /dev/null 2>&1; do \
 		echo "Keycloak is not ready yet..."; \
 		sleep 5; \
 	done
