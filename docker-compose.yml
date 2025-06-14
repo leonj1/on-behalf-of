@@ -1,0 +1,123 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=dev-mem
+      - KC_HTTP_ENABLED=true
+      - KC_HOSTNAME_STRICT=false
+      - KC_HOSTNAME_STRICT_HTTPS=false
+    ports:
+      - "8080:8080"
+    command: start-dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - demo-network
+
+  consent-store:
+    build: ./consent-store
+    container_name: consent-store
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./consent-store-data:/app/data
+    networks:
+      - demo-network
+    depends_on:
+      - keycloak
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  banking-service:
+    image: python:3.11-slim
+    container_name: banking-service
+    working_dir: /app
+    command: >
+      sh -c "pip install -r requirements.txt && 
+             python banking-service.py"
+    ports:
+      - "8012:8012"
+    volumes:
+      - ./banking-service.py:/app/banking-service.py
+      - ./requirements.txt:/app/requirements.txt
+    networks:
+      - demo-network
+    depends_on:
+      - keycloak
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  hello:
+    image: python:3.11-slim
+    container_name: hello
+    working_dir: /app
+    command: >
+      sh -c "pip install -r requirements.txt && 
+             python hello.py"
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./hello.py:/app/hello.py
+      - ./requirements.txt:/app/requirements.txt
+    networks:
+      - demo-network
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  service-a:
+    image: python:3.11-slim
+    container_name: service-a
+    working_dir: /app
+    command: >
+      sh -c "pip install -r requirements.txt && 
+             python service-a.py"
+    ports:
+      - "8004:8004"
+    volumes:
+      - ./service-a.py:/app/service-a.py
+      - ./requirements.txt:/app/requirements.txt
+    networks:
+      - demo-network
+    depends_on:
+      - consent-store
+      - banking-service
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  frontend:
+    image: node:20-alpine
+    container_name: frontend
+    working_dir: /app
+    command: >
+      sh -c "npm install && npm run dev"
+    ports:
+      - "3005:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - demo-network
+    depends_on:
+      - keycloak
+      - service-a
+      - hello
+    environment:
+      - NODE_ENV=development
+
+networks:
+  demo-network:
+    driver: bridge
+
+volumes:
+  consent-store-data:

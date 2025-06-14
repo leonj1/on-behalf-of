@@ -1,0 +1,18 @@
+1. create a docker compose file that launches keycloak
+2. Create Makefile with stop, start, restart targets to manage Keycloak
+3. Start keycloak and validate its online
+4. Create python script named create-clientid.py to create a client id named service-a in keycloak. The script should allow the user to pass a client id via command line argument.
+5. Create integration-test.sh that will launch keycloak, validate its online, then run the python script to create a client id
+6. Run the create-clientid.py to create a client id for service-b
+7. Create a fastapi service called consent-store.py. This service will have a POST endpoint to register an application. A PUT endpoint to add a capability for an application. A DELETE endpoint to delete a capability from an application. Endpoint to delete an application. An endpoint to list all applications. An endpoint to list all capabilities per application. The service should persist data via sqlite. There should be a databaserepository interface and a concrete class that implements this interface for all database interactions.
+8. The consent-store.py should run within a docker container, therefore create Dockerfile for it.
+9. The consent-store.py should be invoked from the existing docker-compose file.
+10. Add features to consent-store.py such as A GET endpoint to determine if a user has approved an requesting application to use a set a capabilities of a destination application, which might be one or more capabilities. A POST endpoint that records the user's consent for a requesting application to use select capabilities of the destination application. A DELETE endpoint to delete consent of a specific user for specific capabilities from a requesting application. A DELETE endpoint to clear all consent for a specific user from all requesting applications. A DELETE endpoint to clear all requesting application consent of all capabilities.
+11. Create a reacjt and tailwindcss frontend where the landing page has a top-header. Top header has buttons for applications and for users. Create a reactjs component named "UserConsent" that will show a list of all existing user consents. UserConsent will allow the user to clear specific capabilities, and remove a user from the consent-store, effectively removing all capabilities.
+12. Create fastapi endpoint named banking-service.py with endpoint POST /withdraw that will require a JWT token. When the JWT token is provided this service will validate the audience "aud" claim is for this service. If audience is not for this service, the endpoint will return HTTP 403. If aduience is for this service then it will respond with "Withdrew $1000 from account".
+13. Create fastapi service named hello.py with endpoint GET /hello that will always return HTTP 200 and contents "hi there!"
+13. configure keycloak for Google authentication, considering keycloak runs on localhost for local development
+14. Create service-a.py as a fastapi application. This service will have POST endpoint name /withdraw and will require JWT token. This /withdraw endpoint will first call consent-store.py to determine if the user has previously granted access for service-a to call service-b for capability "withdraw".
+15. Create nextjs application that landing page that requires user google authentication using keycloak. Once user successfully logs in the logged in page should have two buttons, "Say Hello", and "Empty Bank Account". When Hello button is invoked it will call the hello.py service. When Empty Bank account button is invoked it will call the banking-service.py ensuring the POST request includes the user's JWT token.
+16. Run "make start" and ensure keycloak is online, service-a is online, service-b is online, and consent-store is online.
+
