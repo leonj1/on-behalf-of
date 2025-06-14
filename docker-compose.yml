@@ -7,8 +7,11 @@ services:
       - KEYCLOAK_ADMIN_PASSWORD=admin
       - KC_DB=dev-mem
       - KC_HTTP_ENABLED=true
+      - KC_HOSTNAME=100.68.45.127
       - KC_HOSTNAME_STRICT=false
       - KC_HOSTNAME_STRICT_HTTPS=false
+      - KC_PROXY=edge
+      - KC_HOSTNAME_STRICT_BACKCHANNEL=false
     ports:
       - "8080:8080"
     command: start-dev

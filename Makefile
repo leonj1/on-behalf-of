@@ -8,6 +8,7 @@ start:
 		sleep 5; \
 	done
 	@echo "Keycloak is ready!"
+	@./configure-keycloak.sh
 
 stop:
 	docker compose down
