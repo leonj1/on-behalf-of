@@ -20,11 +20,18 @@ const handler = NextAuth({
     })
   ],
   callbacks: {
-    async jwt({ token, account }) {
+    async jwt({ token, account, profile }) {
       // Persist the OAuth access_token to the token right after signin
       if (account) {
         token.accessToken = account.access_token
         token.idToken = account.id_token
+        // Decode the access token to get the actual user ID
+        try {
+          const payload = JSON.parse(Buffer.from(account.access_token.split('.')[1], 'base64').toString())
+          token.sub = payload.sub // Get sub from the JWT payload
+        } catch (e) {
+          token.sub = account.providerAccountId // Fallback
+        }
       }
       return token
     },
@@ -32,6 +39,7 @@ const handler = NextAuth({
       // Send properties to the client
       session.accessToken = token.accessToken as string
       session.idToken = token.idToken as string
+      session.user.id = token.sub as string // Add user ID to session
       return session
     },
     async redirect({ url, baseUrl }) {

@@ -32,11 +32,14 @@ export function UserConsent() {
     capability: ''
   })
 
-  const userId = session?.user?.email || session?.user?.name || 'unknown'
+  // Use the Keycloak user ID (sub) from session
+  const userId = (session?.user as any)?.id || session?.user?.email || session?.user?.name || 'unknown'
 
   const fetchConsents = async () => {
     if (!session?.user) return
 
+    console.log('Fetching consents for user ID:', userId)
+    
     try {
       const response = await fetch(`http://10.1.1.74:8001/consent/user/${userId}`)
       if (response.ok) {
@@ -288,6 +291,14 @@ export function UserConsent() {
             </button>
           </form>
         )}
+
+        {/* Debug info */}
+        <details style={{ marginBottom: '1rem' }}>
+          <summary style={{ cursor: 'pointer', color: 'var(--pico-muted-color)' }}>Debug Info</summary>
+          <p style={{ fontSize: '0.875rem', fontFamily: 'monospace' }}>
+            User ID: {userId}
+          </p>
+        </details>
 
         {consents.length === 0 ? (
           <p style={{ textAlign: 'center', color: 'var(--pico-muted-color)' }}>
