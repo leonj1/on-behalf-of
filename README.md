@@ -16,6 +16,12 @@ This pattern is crucial for:
 - Building trust in multi-service architectures
 - Complying with data protection regulations
 
+## Video Walkthrough
+
+[![On-Behalf-Of OAuth2 Demo Video](https://img.youtube.com/vi/Bfw0QB_TJ-A/maxresdefault.jpg)](https://www.youtube.com/watch?v=Bfw0QB_TJ-A)
+
+Watch the video above for a complete walkthrough of the on-behalf-of OAuth2 consent flow implementation.
+
 ## Architecture
 
 ### System Components
