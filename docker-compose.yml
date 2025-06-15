@@ -49,6 +49,7 @@ services:
     volumes:
       - ./banking-service.py:/app/banking-service.py
       - ./requirements.txt:/app/requirements.txt
+      - ./banking-service-templates:/app/banking-service-templates
     networks:
       - demo-network
     depends_on:
@@ -92,6 +93,9 @@ services:
       - banking-service
     environment:
       - PYTHONUNBUFFERED=1
+      - CLIENT_SECRET=DD30NUl7MKHNzOsLc0YwEc9KUNkL8DtM
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=master
 
   frontend:
     image: node:20-alpine

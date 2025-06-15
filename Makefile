@@ -79,6 +79,12 @@ setup-consent-store:
 		curl -s -X PUT http://localhost:8001/applications/$$APP_ID/capabilities \
 			-H "Content-Type: application/json" \
 			-d '{"capability": "withdraw"}' > /dev/null && echo "✓ Added 'withdraw' capability to service-b"; \
+		curl -s -X PUT http://localhost:8001/applications/$$APP_ID/capabilities \
+			-H "Content-Type: application/json" \
+			-d '{"capability": "view_balance"}' > /dev/null && echo "✓ Added 'view_balance' capability to service-b"; \
+		curl -s -X PUT http://localhost:8001/applications/$$APP_ID/capabilities \
+			-H "Content-Type: application/json" \
+			-d '{"capability": "transfer"}' > /dev/null && echo "✓ Added 'transfer' capability to service-b"; \
 	else \
 		echo "✗ Could not find service-b application ID"; \
 	fi
@@ -185,3 +191,6 @@ configure-google-auth:
 	fi
 	@echo "Configuring Google authentication in Keycloak..."
 	@./configure-google-auth.sh "$(GOOGLE_CLIENT_ID)" "$(GOOGLE_CLIENT_SECRET)"
+
+restart: stop all
+

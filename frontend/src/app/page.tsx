@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession, signIn, signOut } from 'next-auth/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -9,6 +9,37 @@ export default function Home() {
   const [withdrawMessage, setWithdrawMessage] = useState<string>('')
   const [error, setError] = useState<string>('')
   const [loading, setLoading] = useState<{ hello: boolean; withdraw: boolean }>({ hello: false, withdraw: false })
+  const [consentRequired, setConsentRequired] = useState<any>(null)
+
+  // Check for messages from consent callback
+  useEffect(() => {
+    // Check for successful withdrawal after consent
+    const withdrawSuccess = sessionStorage.getItem('withdrawSuccess')
+    if (withdrawSuccess) {
+      const data = JSON.parse(withdrawSuccess)
+      setWithdrawMessage(JSON.stringify(data, null, 2))
+      sessionStorage.removeItem('withdrawSuccess')
+    }
+    
+    // Check for withdrawal error after consent
+    const withdrawError = sessionStorage.getItem('withdrawError')
+    if (withdrawError) {
+      const errorData = JSON.parse(withdrawError)
+      if (errorData.status === 403) {
+        setError('Access denied: The consent may not have been properly saved. Please try granting consent again.')
+      } else {
+        setError(`Error ${errorData.status}: ${errorData.detail}`)
+      }
+      sessionStorage.removeItem('withdrawError')
+    }
+    
+    // Check for consent denial
+    const consentDenied = sessionStorage.getItem('consentDenied')
+    if (consentDenied) {
+      setError('Consent was denied. You need to grant consent to perform this action.')
+      sessionStorage.removeItem('consentDenied')
+    }
+  }, [])
 
   const callHelloService = async () => {
     setLoading({ ...loading, hello: true })
@@ -46,8 +77,21 @@ export default function Home() {
         setError('')
       } else {
         const errorData = await response.json()
-        setError(`Banking service error: ${errorData.detail || response.statusText}`)
-        setWithdrawMessage('')
+        
+        // Check if it's a consent required error
+        if (errorData.detail && errorData.detail.error_code === 'consent_required') {
+          // Redirect to consent UI
+          const consentParams = errorData.detail.consent_params
+          const params = new URLSearchParams({
+            ...consentParams,
+            user_token: session.accessToken
+          })
+          const consentUrl = `${errorData.detail.consent_ui_url}?${params}`
+          window.location.href = consentUrl
+        } else {
+          setError(`Banking service error: ${errorData.detail || response.statusText}`)
+          setWithdrawMessage('')
+        }
       }
     } catch (err) {
       setError('Failed to call banking service')

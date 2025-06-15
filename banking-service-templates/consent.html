@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consent Request - Banking Service</title>
+    
+    <!-- Material UI Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    <style>
+        /* Material UI Light Theme */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #fafafa;
+            color: rgba(0, 0, 0, 0.87);
+            line-height: 1.5;
+        }
+        
+        /* App Bar */
+        .app-bar {
+            background-color: #2196F3;
+            color: white;
+            padding: 16px 24px;
+            box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 
+                        0px 4px 5px 0px rgba(0,0,0,0.14), 
+                        0px 1px 10px 0px rgba(0,0,0,0.12);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .app-bar h1 {
+            font-size: 20px;
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        /* Container */
+        .consent-container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 0 16px;
+        }
+        
+        /* Card */
+        .card {
+            background: #ffffff;
+            border-radius: 4px;
+            box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 
+                        0px 1px 1px 0px rgba(0,0,0,0.14), 
+                        0px 1px 3px 0px rgba(0,0,0,0.12);
+            padding: 24px;
+        }
+        
+        /* Typography */
+        .consent-title {
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 16px;
+            color: rgba(0, 0, 0, 0.87);
+        }
+        
+        .consent-subtitle {
+            font-size: 16px;
+            color: rgba(0, 0, 0, 0.6);
+            margin-bottom: 24px;
+        }
+        
+        /* Capability Item */
+        .capability-item {
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .capability-item:hover {
+            box-shadow: 0px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .capability-icon {
+            font-size: 24px;
+            width: 24px;
+            height: 24px;
+        }
+        
+        .capability-content {
+            flex: 1;
+        }
+        
+        .capability-name {
+            font-weight: 500;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .capability-description {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.6);
+        }
+        
+        /* Risk Level Chip */
+        .risk-chip {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .risk-high {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .risk-low {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        /* User Info */
+        .user-info {
+            background-color: #e3f2fd;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 24px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-info .material-icons {
+            color: #1976d2;
+        }
+        
+        /* Buttons */
+        .button-container {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+            justify-content: flex-end;
+        }
+        
+        .button {
+            padding: 8px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .button:focus {
+            outline: none;
+        }
+        
+        .button-primary {
+            background-color: #2196F3;
+            color: white;
+            box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2), 
+                        0px 2px 2px 0px rgba(0,0,0,0.14), 
+                        0px 1px 5px 0px rgba(0,0,0,0.12);
+        }
+        
+        .button-primary:hover {
+            background-color: #1976D2;
+            box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 
+                        0px 4px 5px 0px rgba(0,0,0,0.14), 
+                        0px 1px 10px 0px rgba(0,0,0,0.12);
+        }
+        
+        .button-secondary {
+            background-color: transparent;
+            color: #2196F3;
+            border: 1px solid rgba(33, 150, 243, 0.5);
+        }
+        
+        .button-secondary:hover {
+            background-color: rgba(33, 150, 243, 0.08);
+        }
+        
+        /* Ripple Effect */
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .button:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(33, 150, 243, 0.3);
+            border-radius: 50%;
+            border-top-color: #2196F3;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Error State */
+        .error-message {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 16px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            display: none;
+        }
+        
+        .error-message.active {
+            display: block;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .consent-container {
+                margin: 24px auto;
+            }
+            
+            .button-container {
+                flex-direction: column-reverse;
+            }
+            
+            .button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- App Bar -->
+    <div class="app-bar">
+        <i class="material-icons">account_balance</i>
+        <h1>Banking Service</h1>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="consent-container">
+        <div class="card">
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage"></div>
+            
+            <!-- Consent Form -->
+            <div id="consentForm">
+                <h2 class="consent-title">Consent Request</h2>
+                <p class="consent-subtitle">
+                    <strong id="requestingServiceName">Service A</strong> is requesting permission to perform the following actions on your behalf:
+                </p>
+                
+                <!-- Capabilities List -->
+                <div id="capabilitiesList">
+                    <!-- Will be populated dynamically -->
+                </div>
+                
+                <!-- User Info -->
+                <div class="user-info">
+                    <i class="material-icons">person</i>
+                    <div>
+                        <div style="font-weight: 500;">Granting consent for:</div>
+                        <div id="userEmail">Loading...</div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="button-container">
+                    <button class="button button-secondary" onclick="denyConsent()">
+                        DENY
+                    </button>
+                    <button class="button button-primary" onclick="grantConsent()">
+                        GRANT
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Loading State -->
+            <div class="loading" id="loadingState">
+                <div class="spinner"></div>
+                <p style="margin-top: 16px; color: rgba(0, 0, 0, 0.6);">Processing your decision...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestingService = urlParams.get('requesting_service');
+        const requestingServiceName = urlParams.get('requesting_service_name') || 'Unknown Service';
+        const destinationService = urlParams.get('destination_service');
+        const operations = urlParams.get('operations') ? urlParams.get('operations').split(',') : [];
+        const redirectUri = urlParams.get('redirect_uri');
+        const state = urlParams.get('state');
+        const userToken = urlParams.get('user_token');
+        
+        // Capability metadata (in production, fetch from consent.json)
+        const capabilityMetadata = {
+            'withdraw': {
+                icon: 'account_balance_wallet',
+                name: 'Withdraw Funds',
+                description: 'Allow withdrawal of funds from your bank account',
+                riskLevel: 'high'
+            },
+            'view_balance': {
+                icon: 'visibility',
+                name: 'View Balance',
+                description: 'View your current account balance',
+                riskLevel: 'low'
+            },
+            'transfer': {
+                icon: 'swap_horiz',
+                name: 'Transfer Funds',
+                description: 'Transfer funds between accounts',
+                riskLevel: 'high'
+            }
+        };
+        
+        // Initialize the consent form
+        function initializeForm() {
+            // Set requesting service name
+            document.getElementById('requestingServiceName').textContent = requestingServiceName;
+            
+            // Extract user info from JWT token (simplified - in production, validate server-side)
+            if (userToken) {
+                try {
+                    const payload = JSON.parse(atob(userToken.split('.')[1]));
+                    document.getElementById('userEmail').textContent = 
+                        payload.email || payload.preferred_username || payload.sub || 'Unknown User';
+                } catch (e) {
+                    document.getElementById('userEmail').textContent = 'Unknown User';
+                }
+            }
+            
+            // Populate capabilities list
+            const capabilitiesList = document.getElementById('capabilitiesList');
+            operations.forEach(operation => {
+                const capability = capabilityMetadata[operation] || {
+                    icon: 'help_outline',
+                    name: operation,
+                    description: 'Unknown capability',
+                    riskLevel: 'unknown'
+                };
+                
+                const capabilityHtml = `
+                    <div class="capability-item">
+                        <i class="material-icons capability-icon">${capability.icon}</i>
+                        <div class="capability-content">
+                            <div class="capability-name">
+                                ${capability.name}
+                                <span class="risk-chip risk-${capability.riskLevel}">
+                                    ${capability.riskLevel} risk
+                                </span>
+                            </div>
+                            <div class="capability-description">${capability.description}</div>
+                        </div>
+                    </div>
+                `;
+                capabilitiesList.innerHTML += capabilityHtml;
+            });
+            
+            // Validate required parameters
+            if (!redirectUri || !state || !operations.length) {
+                showError('Invalid consent request parameters');
+            }
+        }
+        
+        // Grant consent
+        async function grantConsent() {
+            showLoading();
+            
+            try {
+                const response = await fetch('/consent/decision', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${userToken}`
+                    },
+                    body: JSON.stringify({
+                        decision: 'grant',
+                        requesting_service: requestingService,
+                        operations: operations,
+                        state: state
+                    })
+                });
+                
+                if (response.ok) {
+                    // Redirect back with success
+                    window.location.href = `${redirectUri}?granted=true&state=${encodeURIComponent(state)}`;
+                } else {
+                    const error = await response.json();
+                    showError(error.detail || 'Failed to grant consent');
+                }
+            } catch (e) {
+                showError('Network error. Please try again.');
+            }
+        }
+        
+        // Deny consent
+        function denyConsent() {
+            // Redirect back with denial
+            window.location.href = `${redirectUri}?granted=false&state=${encodeURIComponent(state)}`;
+        }
+        
+        // Show loading state
+        function showLoading() {
+            document.getElementById('consentForm').style.display = 'none';
+            document.getElementById('loadingState').classList.add('active');
+        }
+        
+        // Show error
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').classList.add('active');
+            document.getElementById('loadingState').classList.remove('active');
+            document.getElementById('consentForm').style.display = 'block';
+        }
+        
+        // Initialize on load
+        window.onload = initializeForm;
+    </script>
+</body>
+</html>

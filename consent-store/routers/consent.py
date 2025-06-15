@@ -68,6 +68,30 @@ def check_consent(consent: ConsentCheck = Depends(), db: DatabaseRepository = De
     
     return ConsentCheckResponse(granted=granted, all_granted=all_granted)
 
+@router.post("/check", response_model=ConsentCheckResponse)
+def check_consent_post(consent: ConsentCheck, db: DatabaseRepository = Depends(get_repository)):
+    """Check if user has granted consent for specific capabilities (POST version)"""
+    # Get application IDs
+    requesting_app = db.get_application_by_name(consent.requesting_app_name)
+    if not requesting_app:
+        raise HTTPException(status_code=404, detail=f"Requesting application '{consent.requesting_app_name}' not found")
+    
+    destination_app = db.get_application_by_name(consent.destination_app_name)
+    if not destination_app:
+        raise HTTPException(status_code=404, detail=f"Destination application '{consent.destination_app_name}' not found")
+    
+    # Check consent
+    granted = db.check_consent(
+        consent.user_id,
+        requesting_app['id'],
+        destination_app['id'],
+        consent.capabilities
+    )
+    
+    all_granted = all(granted.values())
+    
+    return ConsentCheckResponse(granted=granted, all_granted=all_granted)
+
 @router.delete("/user/{user_id}/capability", response_model=MessageResponse)
 def revoke_specific_consent(user_id: str, revoke: ConsentRevoke, db: DatabaseRepository = Depends(get_repository)):
     """Revoke specific consent for a user"""
