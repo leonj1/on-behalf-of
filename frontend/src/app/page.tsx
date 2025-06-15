@@ -8,8 +8,10 @@ export default function Home() {
   const [helloMessage, setHelloMessage] = useState<string>('')
   const [withdrawMessage, setWithdrawMessage] = useState<string>('')
   const [error, setError] = useState<string>('')
+  const [loading, setLoading] = useState<{ hello: boolean; withdraw: boolean }>({ hello: false, withdraw: false })
 
   const callHelloService = async () => {
+    setLoading({ ...loading, hello: true })
     try {
       const response = await fetch('http://10.1.1.74:8003/hello')
       const data = await response.text()
@@ -17,6 +19,8 @@ export default function Home() {
       setError('')
     } catch (err) {
       setError('Failed to call hello service')
+    } finally {
+      setLoading({ ...loading, hello: false })
     }
   }
 
@@ -26,6 +30,7 @@ export default function Home() {
       return
     }
 
+    setLoading({ ...loading, withdraw: true })
     try {
       const response = await fetch('http://10.1.1.74:8004/withdraw', {
         method: 'POST',
@@ -47,92 +52,131 @@ export default function Home() {
     } catch (err) {
       setError('Failed to call banking service')
       setWithdrawMessage('')
+    } finally {
+      setLoading({ ...loading, withdraw: false })
     }
   }
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-lg">Loading...</p>
-      </div>
+      <main className="container">
+        <article aria-busy="true" style={{ minHeight: '200px' }}>
+          <p className="text-center">Loading authentication status...</p>
+        </article>
+      </main>
     )
   }
 
   if (!session) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full space-y-8">
+      <main className="container">
+        <article style={{ maxWidth: '600px', margin: '5rem auto', padding: '3rem' }}>
+          <header className="text-center mb-4">
+            <h1 className="header-gradient">On-Behalf-Of Demo</h1>
+            <p>Experience OAuth2 flow with consent management</p>
+          </header>
+          
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900">On-Behalf-Of Demo</h1>
-            <p className="mt-2 text-gray-600">Please sign in with Google via Keycloak</p>
+            <p style={{ marginBottom: '2rem', color: 'var(--pico-muted-color)' }}>
+              Sign in with your Keycloak account to access protected services
+            </p>
+            <button 
+              onClick={() => signIn('keycloak')}
+              className="btn-gradient-primary"
+              style={{ width: '100%', padding: '1rem', fontSize: '1.1rem' }}
+            >
+              🔐 Sign in with Keycloak
+            </button>
           </div>
-          <button
-            onClick={() => signIn('keycloak')}
-            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition duration-200"
-          >
-            Sign in with Google
-          </button>
-        </div>
-      </div>
+        </article>
+      </main>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto p-8">
-        <div className="bg-white shadow rounded-lg p-6">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Welcome, {session.user?.name || session.user?.email}</h1>
-              <p className="text-gray-600">You are successfully authenticated</p>
-            </div>
-            <button
-              onClick={() => signOut()}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md transition duration-200"
-            >
-              Sign out
-            </button>
+    <main className="container">
+      <article style={{ marginTop: '2rem', marginBottom: '2rem' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+          <div>
+            <h1 className="header-gradient" style={{ marginBottom: '0.5rem' }}>
+              Welcome, {session.user?.name || session.user?.email}
+            </h1>
+            <p style={{ color: 'var(--pico-muted-color)', margin: 0 }}>
+              You are successfully authenticated
+            </p>
           </div>
+          <button
+            onClick={() => signOut()}
+            className="btn-gradient-danger"
+            style={{ padding: '0.75rem 1.5rem' }}
+          >
+            Sign out
+          </button>
+        </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <h2 className="text-lg font-semibold mb-4">Hello Service (Unprotected)</h2>
-              <button
-                onClick={callHelloService}
-                className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md transition duration-200"
-              >
-                Say Hello
-              </button>
-              {helloMessage && (
-                <div className="mt-4 p-4 bg-green-100 text-green-800 rounded">
-                  {helloMessage}
-                </div>
-              )}
-            </div>
+        <div className="grid" style={{ gap: '2rem', marginTop: '3rem' }}>
+          <article style={{ padding: '2rem' }}>
+            <header>
+              <h3 style={{ marginBottom: '0.5rem' }}>🌟 Hello Service</h3>
+              <p style={{ color: 'var(--pico-muted-color)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+                Unprotected endpoint - No authentication required
+              </p>
+            </header>
+            
+            <button
+              onClick={callHelloService}
+              className="btn-gradient-success"
+              aria-busy={loading.hello}
+              disabled={loading.hello}
+              style={{ width: '100%', padding: '1rem' }}
+            >
+              {loading.hello ? 'Calling...' : 'Say Hello'}
+            </button>
+            
+            {helloMessage && (
+              <div className="response-box response-success">
+                <strong>Response:</strong> {helloMessage}
+              </div>
+            )}
+          </article>
 
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <h2 className="text-lg font-semibold mb-4">Banking Service (Protected)</h2>
-              <button
-                onClick={callBankingService}
-                className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md transition duration-200"
-              >
-                Empty Bank Account
-              </button>
-              {withdrawMessage && (
-                <pre className="mt-4 p-4 bg-purple-100 text-purple-800 rounded text-sm overflow-auto">
+          <article style={{ padding: '2rem' }}>
+            <header>
+              <h3 style={{ marginBottom: '0.5rem' }}>💰 Banking Service</h3>
+              <p style={{ color: 'var(--pico-muted-color)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+                Protected endpoint - Requires consent and JWT validation
+              </p>
+            </header>
+            
+            <button
+              onClick={callBankingService}
+              className="btn-gradient-purple"
+              aria-busy={loading.withdraw}
+              disabled={loading.withdraw}
+              style={{ width: '100%', padding: '1rem' }}
+            >
+              {loading.withdraw ? 'Processing...' : 'Empty Bank Account'}
+            </button>
+            
+            {withdrawMessage && (
+              <div className="response-box response-info">
+                <strong>Response:</strong>
+                <pre style={{ margin: '0.5rem 0 0 0', whiteSpace: 'pre-wrap' }}>
                   {withdrawMessage}
                 </pre>
-              )}
-            </div>
-          </div>
-
-          {error && (
-            <div className="mt-6 p-4 bg-red-100 text-red-800 rounded">
-              {error}
-            </div>
-          )}
+              </div>
+            )}
+          </article>
         </div>
-      </div>
-    </div>
+
+        {error && (
+          <article style={{ marginTop: '2rem', padding: '1.5rem' }}>
+            <div className="response-box response-error" style={{ margin: 0 }}>
+              <strong>⚠️ Error:</strong> {error}
+            </div>
+          </article>
+        )}
+      </article>
+    </main>
   )
 }

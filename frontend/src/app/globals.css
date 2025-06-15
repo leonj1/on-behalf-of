@@ -1,3 +1,150 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Custom gradient buttons and enhancements for Pico CSS dark theme */
+
+/* Override Pico CSS primary color */
+:root[data-theme="dark"] {
+  --pico-primary: #6366f1;
+  --pico-primary-hover: #5558e9;
+  --pico-background-color: #0a0a0a;
+  --pico-card-background-color: #1a1a1a;
+}
+
+/* Base button styles with transitions */
+button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.5px;
+}
+
+/* Gradient button styles */
+.btn-gradient-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+}
+
+.btn-gradient-primary:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b3f8f 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-gradient-success {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  border: none;
+  color: white;
+}
+
+.btn-gradient-success:hover {
+  background: linear-gradient(135deg, #0f8a7f 0%, #30d66a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+}
+
+.btn-gradient-purple {
+  background: linear-gradient(135deg, #9c27b0 0%, #e91e63 100%);
+  border: none;
+  color: white;
+}
+
+.btn-gradient-purple:hover {
+  background: linear-gradient(135deg, #8a229c 0%, #d11656 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(156, 39, 176, 0.3);
+}
+
+.btn-gradient-danger {
+  background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);
+  border: none;
+  color: white;
+}
+
+.btn-gradient-danger:hover {
+  background: linear-gradient(135deg, #da220f 0%, #dd9a16 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(241, 39, 17, 0.3);
+}
+
+/* Card enhancements */
+article {
+  background: var(--pico-card-background-color);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+article:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Response boxes */
+.response-box {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.response-success {
+  background: rgba(17, 153, 142, 0.1);
+  border: 1px solid rgba(17, 153, 142, 0.3);
+  color: #38ef7d;
+}
+
+.response-error {
+  background: rgba(241, 39, 17, 0.1);
+  border: 1px solid rgba(241, 39, 17, 0.3);
+  color: #f5af19;
+}
+
+.response-info {
+  background: rgba(156, 39, 176, 0.1);
+  border: 1px solid rgba(156, 39, 176, 0.3);
+  color: #e91e63;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading spinner enhancement */
+[aria-busy="true"]::before {
+  border-color: #667eea transparent #667eea transparent;
+}
+
+/* Header styles */
+.header-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+}
+
+/* Small utilities */
+.text-center {
+  text-align: center;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}

@@ -13,6 +13,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@picocss/pico": "^2.1.1",
     "@tailwindcss/postcss": "^4.1.10",
     "@types/node": "^24.0.1",
     "@types/react": "^19.1.8",
