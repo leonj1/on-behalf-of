@@ -11,7 +11,7 @@ export default function Home() {
 
   const callHelloService = async () => {
     try {
-      const response = await fetch('http://localhost:8003/hello')
+      const response = await fetch('http://10.1.1.74:8003/hello')
       const data = await response.text()
       setHelloMessage(data)
       setError('')
@@ -27,7 +27,7 @@ export default function Home() {
     }
 
     try {
-      const response = await fetch('http://localhost:8004/withdraw', {
+      const response = await fetch('http://10.1.1.74:8004/withdraw', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.accessToken}`,

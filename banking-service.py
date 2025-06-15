@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.middleware.cors import CORSMiddleware
 from jose import jwt, JWTError
 import httpx
 from typing import Optional
@@ -8,6 +9,15 @@ app = FastAPI(
     title="Banking Service",
     description="Protected banking service with JWT validation",
     version="1.0.0"
+)
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://localhost:3005", "http://10.1.1.74:3005", "http://100.68.45.127:3005"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Security scheme
