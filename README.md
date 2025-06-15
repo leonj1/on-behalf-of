@@ -18,12 +18,154 @@ This pattern is crucial for:
 
 ## Architecture
 
+### System Components
+
+```mermaid
+graph TB
+    subgraph "User Interface"
+        UI[NextJS Frontend<br/>Port: 3005]
+    end
+    
+    subgraph "Identity Provider"
+        KC[Keycloak<br/>Port: 8080]
+    end
+    
+    subgraph "Microservices"
+        SA[Service A<br/>Port: 8004<br/>Acts on-behalf-of users]
+        BS[Banking Service<br/>Port: 8012<br/>Protected resource]
+        HS[Hello Service<br/>Port: 8003<br/>Unprotected]
+    end
+    
+    subgraph "Consent Management"
+        CS[Consent Store<br/>Port: 8001<br/>SQLite DB]
+    end
+    
+    UI -->|Authenticate| KC
+    UI -->|Call with JWT| SA
+    UI -->|Direct call| HS
+    SA -->|Check consent| CS
+    SA -->|On-behalf-of call| BS
+    BS -->|Save consent| CS
+    BS -->|Consent UI| UI
+    
+    style UI fill:#1e3a5f
+    style KC fill:#4a5568
+    style SA fill:#2d3748
+    style BS fill:#2d3748
+    style HS fill:#2d3748
+    style CS fill:#4a5568
+```
+
+### System Components Details
+
 - **Keycloak**: Identity and Access Management (OAuth2/OIDC provider)
 - **Consent Store**: Manages application capabilities and user consent decisions
 - **Service A**: Acts on behalf of users to call other services
 - **Banking Service**: Protected service requiring specific JWT audience claims
 - **Hello Service**: Simple unprotected service for comparison
 - **NextJS Frontend**: User interface with Pico CSS dark theme for authentication and service interaction
+
+### How It Works
+
+The following diagram illustrates the complete on-behalf-of OAuth2 consent flow:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Keycloak
+    participant ServiceA
+    participant ConsentStore
+    participant BankingService
+
+    %% Initial Authentication
+    User->>Frontend: 1. Access application
+    Frontend->>User: 2. Show login page
+    User->>Frontend: 3. Click "Sign in with Keycloak"
+    Frontend->>Keycloak: 4. Redirect to Keycloak login
+    User->>Keycloak: 5. Enter credentials
+    Keycloak->>Frontend: 6. Return with auth code
+    Frontend->>Keycloak: 7. Exchange code for tokens
+    Keycloak->>Frontend: 8. Return JWT tokens (aud: "account", "master-realm")
+    Frontend->>User: 9. Show authenticated UI
+
+    %% First Attempt (No Consent)
+    User->>Frontend: 10. Click "Empty Bank Account"
+    Frontend->>ServiceA: 11. POST /withdraw<br/>Bearer: JWT token
+    
+    Note over ServiceA: Extract user ID from JWT
+    ServiceA->>ConsentStore: 12. Check consent<br/>user_id, service-a→service-b, withdraw
+    ConsentStore->>ServiceA: 13. No consent found
+    ServiceA->>Frontend: 14. 403 Forbidden<br/>consent_required error
+    Frontend->>User: 15. Redirect to consent UI
+
+    %% Consent Grant Flow
+    User->>BankingService: 16. View consent page<br/>(Material UI themed)
+    BankingService->>User: 17. Show consent request<br/>"Service A wants to withdraw funds"
+    User->>BankingService: 18. Click "Grant"
+    BankingService->>ConsentStore: 19. Save consent<br/>user_id, service-a→service-b, [withdraw]
+    ConsentStore->>BankingService: 20. Consent saved
+    BankingService->>Frontend: 21. Redirect back<br/>granted=true
+    Frontend->>User: 22. Show success message
+
+    %% Second Attempt (With Consent)
+    User->>Frontend: 23. Retry "Empty Bank Account"
+    Frontend->>ServiceA: 24. POST /withdraw<br/>Bearer: JWT token
+    ServiceA->>ConsentStore: 25. Check consent<br/>user_id, service-a→service-b, withdraw
+    ConsentStore->>ServiceA: 26. Consent granted: true
+    
+    Note over ServiceA: Attempt token exchange<br/>(falls back to original token)
+    ServiceA->>BankingService: 27. POST /withdraw<br/>Bearer: JWT token
+    Note over BankingService: Validate JWT audience<br/>Accept: banking-service,<br/>service-a, account, nextjs-app
+    BankingService->>ServiceA: 28. Success: $1000 withdrawn
+    ServiceA->>Frontend: 29. Success response
+    Frontend->>User: 30. Show withdrawal success
+
+    %% Consent Management
+    User->>Frontend: 31. Click "Manage Consents"
+    Frontend->>ConsentStore: 32. GET /consent/user/{user_id}
+    ConsentStore->>Frontend: 33. List of user's consents
+    Frontend->>User: 34. Show consent list with revoke options
+```
+
+### Consent Lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> NoConsent: User authenticated
+    
+    NoConsent --> ConsentRequired: Service A attempts<br/>on-behalf-of call
+    
+    ConsentRequired --> ConsentUI: User redirected<br/>to consent page
+    
+    ConsentUI --> ConsentDenied: User clicks "Deny"
+    ConsentUI --> ConsentGranted: User clicks "Grant"
+    
+    ConsentDenied --> NoConsent: Redirect back
+    
+    ConsentGranted --> ConsentStored: Save to<br/>consent store
+    
+    ConsentStored --> ActiveConsent: Consent active
+    
+    ActiveConsent --> ServiceCallSuccess: Service A calls<br/>Banking Service
+    
+    ServiceCallSuccess --> ActiveConsent: Ready for<br/>more calls
+    
+    ActiveConsent --> ConsentRevoked: User revokes<br/>consent
+    
+    ConsentRevoked --> NoConsent: Consent removed
+    
+    NoConsent --> [*]: User signs out
+    ActiveConsent --> [*]: User signs out
+```
+
+### Key Security Features
+
+1. **JWT Audience Validation**: Banking service validates that tokens have the correct audience claim
+2. **Consent Checking**: Service A always checks consent before calling protected services
+3. **User Control**: Users can grant/revoke consent at any time through the UI
+4. **CSRF Protection**: State tokens prevent cross-site request forgery in consent flow
+5. **Scoped Permissions**: Consent is granted for specific capabilities (withdraw, view_balance, transfer)
 
 ## Features
 
