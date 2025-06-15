@@ -105,13 +105,18 @@ export default function Home() {
               You are successfully authenticated
             </p>
           </div>
-          <button
-            onClick={() => signOut()}
-            className="btn-gradient-danger"
-            style={{ padding: '0.75rem 1.5rem' }}
-          >
-            Sign out
-          </button>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <a href="/consent" className="btn-gradient-primary" style={{ padding: '0.75rem 1.5rem', textDecoration: 'none' }}>
+              Manage Consents
+            </a>
+            <button
+              onClick={() => signOut()}
+              className="btn-gradient-danger"
+              style={{ padding: '0.75rem 1.5rem' }}
+            >
+              Sign out
+            </button>
+          </div>
         </header>
 
         <div className="grid" style={{ gap: '2rem', marginTop: '3rem' }}>

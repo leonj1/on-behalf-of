@@ -29,8 +29,9 @@ This pattern is crucial for:
 
 - OAuth2/OIDC authentication via Keycloak
 - Service-to-service authorization with JWT validation
-- Explicit consent management system
+- Explicit consent management system with UI
 - Beautiful dark-themed UI with gradient buttons
+- User-friendly consent management interface
 - Support for both local and external IP access
 - Optional Google authentication integration
 
@@ -79,8 +80,18 @@ This command will:
 3. Login with the test user credentials or admin account
 4. Test the "Say Hello" button - this should work immediately (unprotected service)
 5. Test the "Empty Bank Account" button - this will fail with a consent error
-6. Grant consent through the consent store API (see API documentation)
-7. Retry "Empty Bank Account" - it should now succeed
+6. Click "Manage Consents" to access the consent management UI
+7. Grant consent for service-a to use service-b's withdraw capability
+8. Return to home and retry "Empty Bank Account" - it should now succeed
+
+### Quick Test with Pre-granted Consent
+
+To quickly test the full flow with pre-granted consent:
+```bash
+./grant-test-consent.sh
+```
+
+This grants consent for both admin and testuser to allow service-a to perform withdrawals.
 
 ## Useful Commands
 
