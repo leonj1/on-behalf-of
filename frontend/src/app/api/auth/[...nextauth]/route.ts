@@ -7,6 +7,16 @@ const handler = NextAuth({
       clientId: process.env.KEYCLOAK_CLIENT_ID || 'nextjs-app',
       clientSecret: process.env.KEYCLOAK_CLIENT_SECRET || '',
       issuer: process.env.KEYCLOAK_ISSUER || 'http://localhost:8080/realms/master',
+      // Override the wellKnown endpoint to use the public URL
+      wellKnown: `${process.env.KEYCLOAK_ISSUER || 'http://localhost:8080/realms/master'}/.well-known/openid-configuration`,
+      authorization: {
+        params: {
+          scope: 'openid email profile'
+        },
+        url: `${process.env.KEYCLOAK_ISSUER_PUBLIC || process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/auth`
+      },
+      token: `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/token`,
+      userinfo: `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/userinfo`,
     })
   ],
   callbacks: {
@@ -23,6 +33,12 @@ const handler = NextAuth({
       session.accessToken = token.accessToken as string
       session.idToken = token.idToken as string
       return session
+    },
+    async redirect({ url, baseUrl }) {
+      // Handle redirects to use the public URL for client-side
+      if (url.startsWith('/')) return `${baseUrl}${url}`
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
     },
   },
 })

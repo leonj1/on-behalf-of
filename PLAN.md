@@ -59,12 +59,15 @@ This project demonstrates a microservices architecture with OAuth2/OIDC authenti
   - Run `create-clientid.py` for service-b
   - Verify clients created successfully
 
-#### 2.3 Configure Google Authentication
-- Document manual steps for Keycloak admin console:
-  - Create Google Identity Provider
-  - Add OAuth 2.0 Client ID and Secret
-  - Configure redirect URI for localhost development
-  - Enable first login flow
+#### 2.3 Configure Google Authentication ✅
+- Created `configure-google-auth.sh` script for automated setup
+- Created `GOOGLE_AUTH_SETUP.md` with detailed instructions
+- Added `make configure-google-auth` target
+- Script configures:
+  - Google Identity Provider in Keycloak
+  - OAuth 2.0 Client ID and Secret
+  - Redirect URIs for localhost and external IP
+  - Trust email and token storage settings
 
 ### Phase 3: Core Services Implementation ✅ COMPLETED
 
