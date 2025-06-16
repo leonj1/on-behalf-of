@@ -122,9 +122,29 @@ export default function Home() {
           </header>
           
           <div className="text-center">
-            <p style={{ marginBottom: '2rem', color: 'var(--pico-muted-color)' }}>
+            <p style={{ marginBottom: '1.5rem', color: 'var(--pico-muted-color)' }}>
               Sign in with your Keycloak account to access protected services
             </p>
+            
+            <div style={{ 
+              backgroundColor: 'var(--pico-card-background-color)', 
+              border: '1px solid var(--pico-border-color)',
+              borderRadius: '0.5rem',
+              padding: '1.5rem',
+              marginBottom: '2rem',
+              textAlign: 'left'
+            }}>
+              <h4 style={{ marginBottom: '1rem', color: 'var(--pico-color)' }}>🔑 Demo Credentials</h4>
+              <div style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <strong>Username:</strong> <span style={{ color: 'var(--pico-primary)' }}>admin</span>
+                </div>
+                <div>
+                  <strong>Password:</strong> <span style={{ color: 'var(--pico-primary)' }}>admin</span>
+                </div>
+              </div>
+            </div>
+            
             <button 
               onClick={() => signIn('keycloak')}
               className="btn-gradient-primary"

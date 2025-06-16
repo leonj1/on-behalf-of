@@ -159,3 +159,5 @@ keycloak-data/
 # Project specific
 client_secrets.json
 service_account.json
+package-lock.json
+
