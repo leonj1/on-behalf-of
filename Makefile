@@ -38,6 +38,13 @@ ps:
 setup-clients:
 	@echo "Creating Keycloak client IDs..."
 	@echo "----------------------------------------"
+	@echo "Ensuring Keycloak is ready for client operations..."
+	@until docker exec keycloak /opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:8080 --realm master --user admin --password admin --client admin-cli > /dev/null 2>&1; do \
+		echo "Waiting for Keycloak admin access..."; \
+		sleep 3; \
+	done
+	@echo "✓ Keycloak admin access confirmed"
+	@echo ""
 	@echo "Creating client: service-a"
 	@python3 create-clientid.py --client-id service-a || echo "Client service-a may already exist"
 	@echo ""
@@ -50,13 +57,7 @@ setup-clients:
 	@echo "Updating nextjs-app redirect URIs..."
 	@./update-nextjs-client.sh
 	@echo ""
-	#@echo "Syncing frontend client secret..."
-	#@if [ ! -f frontend/.env.local ]; then \
-	#	if [ -f frontend/.env.local.example ]; then \
-	#		cp frontend/.env.local.example frontend/.env.local; \
-	#		echo "✓ Created frontend/.env.local from example"; \
-	#	fi \
-	#fi
+	@echo "Updating frontend client secret..."
 	@./update-frontend-secret.sh
 	@echo "----------------------------------------"
 	@echo "✓ All clients created successfully"
