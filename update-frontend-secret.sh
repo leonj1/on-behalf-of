@@ -37,7 +37,7 @@ if [ -n "$CLIENT_UUID" ]; then
       echo "✓ Updated frontend/.env.local with new client secret"
       
       # Restart frontend to apply changes
-      docker compose restart frontend > /dev/null 2>&1
+      docker-compose restart frontend > /dev/null 2>&1
       echo "✓ Restarted frontend service"
     else
       echo "✗ frontend/.env.local not found"

@@ -15,7 +15,7 @@ all: setup show-secrets
 	@echo "For client credentials, run: make show-secrets"
 
 start:
-	docker compose up -d
+	docker-compose up -d
 	@echo "Waiting for Keycloak to be ready..."
 	@until curl -sf http://localhost:$${KEYCLOAK_PORT:-8080}/ > /dev/null 2>&1; do \
 		echo "Keycloak is not ready yet..."; \
@@ -25,15 +25,15 @@ start:
 	@./configure-keycloak.sh
 
 stop:
-	docker compose down
+	docker-compose down
 
 restart: stop start
 
 logs:
-	docker compose logs -f
+	docker-compose logs -f
 
 ps:
-	docker compose ps
+	docker-compose ps
 
 setup-clients:
 	@echo "Creating Keycloak client IDs..."
@@ -50,13 +50,13 @@ setup-clients:
 	@echo "Updating nextjs-app redirect URIs..."
 	@./update-nextjs-client.sh
 	@echo ""
-	@echo "Syncing frontend client secret..."
-	@if [ ! -f frontend/.env.local ]; then \
-		if [ -f frontend/.env.local.example ]; then \
-			cp frontend/.env.local.example frontend/.env.local; \
-			echo "✓ Created frontend/.env.local from example"; \
-		fi \
-	fi
+	#@echo "Syncing frontend client secret..."
+	#@if [ ! -f frontend/.env.local ]; then \
+	#	if [ -f frontend/.env.local.example ]; then \
+	#		cp frontend/.env.local.example frontend/.env.local; \
+	#		echo "✓ Created frontend/.env.local from example"; \
+	#	fi \
+	#fi
 	@./update-frontend-secret.sh
 	@echo "----------------------------------------"
 	@echo "✓ All clients created successfully"
