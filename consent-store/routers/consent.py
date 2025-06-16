@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Response
 from typing import List
 from models.schemas import (
     ConsentGrant, ConsentCheck, ConsentCheckResponse, ConsentRevoke,
@@ -7,6 +7,20 @@ from models.schemas import (
 from database.repository import DatabaseRepository
 
 router = APIRouter(prefix="/consent", tags=["consent"])
+
+# Add OPTIONS handler for all consent routes
+@router.options("/{path:path}")
+async def consent_options_handler(path: str):
+    """Handle preflight OPTIONS requests for consent routes"""
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Max-Age": "3600",
+        }
+    )
 
 def get_repository() -> DatabaseRepository:
     import consent_store
@@ -122,7 +136,12 @@ def revoke_all_consent(db: DatabaseRepository = Depends(get_repository)):
     return CountResponse(count=count)
 
 @router.get("/user/{user_id}", response_model=List[UserConsent])
-def list_user_consents(user_id: str, db: DatabaseRepository = Depends(get_repository)):
+def list_user_consents(user_id: str, response: Response, db: DatabaseRepository = Depends(get_repository)):
     """List all consents for a specific user"""
+    # Add CORS headers directly
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    
     consents = db.list_user_consents(user_id)
     return [UserConsent(**consent) for consent in consents]

@@ -46,7 +46,7 @@ app.add_middleware(
 security = HTTPBearer()
 
 # Configuration
-CONSENT_STORE_URL = CONSENT_STORE_INTERNAL_URL
+CONSENT_STORE_URL = os.getenv("CONSENT_STORE_INTERNAL_URL", "http://consent-store:8001")
 BANKING_SERVICE_URL = BANKING_SERVICE_EXTERNAL_URL
 SERVICE_NAME = "service-a"
 
