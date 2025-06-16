@@ -7,8 +7,8 @@ services:
       - KC_BOOTSTRAP_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
       - KC_DB=dev-mem
       - KC_HTTP_ENABLED=true
-      - KEYCLOAK_EXTERNAL_URL=keycloak-api.joseserver.com
-      - KC_HOSTNAME=keycloak-api.joseserver.com
+      - KEYCLOAK_EXTERNAL_URL=https://keycloak-api.joseserver.com
+      - KC_HOSTNAME=https://keycloak-api.joseserver.com
       - KC_HOSTNAME_URL=${KEYCLOAK_EXTERNAL_URL}
       - KC_HOSTNAME_STRICT=false
       - KC_HOSTNAME_STRICT_HTTPS=false
