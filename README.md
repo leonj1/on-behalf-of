@@ -224,6 +224,11 @@ The application supports flexible configuration for different deployment environ
 ```bash
 ./setup-env.sh
 ```
+This will prompt you to configure:
+- Local service hosts and ports
+- External IP addresses for remote access
+- Keycloak configuration
+- Frontend environment settings
 
 **Option 3: Manual Configuration**
 ```bash

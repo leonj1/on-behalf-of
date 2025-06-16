@@ -13,6 +13,12 @@ All hardcoded IP addresses, localhost references, and port numbers have been rem
 ./setup-env.sh
 ```
 
+The setup script will guide you through configuring:
+1. **Local Service Configuration** - Ports and hosts for services running locally
+2. **External Access Configuration** - IP addresses for external/remote access
+3. **Keycloak Configuration** - Authentication server settings
+4. **Frontend Configuration** - Automatically updates frontend environment based on your choices
+
 ### Option 2: Manual Setup
 ```bash
 cp .env.example .env
@@ -69,6 +75,17 @@ The application will work with default values if no .env file is present.
 | `VITE_CONSENT_STORE_URL` | `http://localhost:8001` | Consent store URL |
 | `VITE_HELLO_SERVICE_URL` | `http://localhost:8003` | Hello service URL |
 
+### Frontend Authentication Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NEXTAUTH_URL` | `http://CHANGE_ME_FRONTEND_IP:3005` | NextAuth callback URL |
+| `NEXTAUTH_SECRET` | Auto-generated | NextAuth secret key |
+| `KEYCLOAK_CLIENT_ID` | `nextjs-app` | Keycloak client ID for frontend |
+| `KEYCLOAK_CLIENT_SECRET` | Auto-generated | Keycloak client secret |
+| `KEYCLOAK_ISSUER` | `http://keycloak:8080/realms/master` | Internal Keycloak issuer URL |
+| `KEYCLOAK_ISSUER_PUBLIC` | `http://CHANGE_ME_IP:8080/realms/master` | Public Keycloak issuer URL |
+
 ## Deployment Examples
 
 ### Local Development
@@ -124,7 +141,9 @@ make setup
 
 ### Frontend
 - `frontend/src/lib/config.ts` - Frontend configuration module
+- `frontend/.env.local` - NextAuth and API configuration  
 - Uses Vite environment variables (`VITE_*` prefix)
+- Uses Next.js environment variables (`NEXT_PUBLIC_*` prefix)
 - Includes helper functions for building URLs
 
 ### Infrastructure

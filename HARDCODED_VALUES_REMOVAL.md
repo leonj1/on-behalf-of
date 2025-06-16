@@ -62,6 +62,8 @@ This document tracks the progress of removing hardcoded IP addresses, localhost 
 - [x] Replace KC_HOSTNAME hardcoded IP with Docker service name fallback
 - [x] Replace specific IP addresses in .env.example with generic placeholders
 - [x] Replace wildcard imports with explicit imports in all service files
+- [x] Fix frontend .env.local hardcoded IP addresses
+- [x] Update frontend .env.local.example with placeholders
 
 ### Makefile
 - [x] Already uses environment variables properly
@@ -87,6 +89,12 @@ This document tracks the progress of removing hardcoded IP addresses, localhost 
 - [x] Improve namespace clarity in service-a.py  
 - [x] Improve namespace clarity in hello.py
 - [x] Improve namespace clarity in consent-store/consent_store.py
+
+## Cleanup and Optimization
+
+- [x] Remove unused LLM_PROXY configuration
+- [x] Clean up setup-env.sh to remove LLM proxy prompts
+- [x] Remove LLM proxy from config.py and frontend config
 
 ## Final Steps
 

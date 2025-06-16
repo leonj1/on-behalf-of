@@ -29,11 +29,6 @@ HELLO_SERVICE_HOST = os.getenv('HELLO_SERVICE_HOST', 'localhost')
 HELLO_SERVICE_PORT = int(os.getenv('HELLO_SERVICE_PORT', '8003'))
 HELLO_SERVICE_URL = f"http://{HELLO_SERVICE_HOST}:{HELLO_SERVICE_PORT}"
 
-# LLM Proxy Configuration
-LLM_PROXY_HOST = os.getenv('LLM_PROXY_HOST', 'localhost')
-LLM_PROXY_PORT = int(os.getenv('LLM_PROXY_PORT', '8012'))
-LLM_PROXY_URL = f"http://{LLM_PROXY_HOST}:{LLM_PROXY_PORT}"
-
 # Keycloak Configuration
 KEYCLOAK_HOST = os.getenv('KEYCLOAK_HOST', 'localhost')
 KEYCLOAK_PORT = int(os.getenv('KEYCLOAK_PORT', '8080'))
