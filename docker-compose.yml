@@ -7,9 +7,13 @@ services:
       - KC_BOOTSTRAP_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
       - KC_DB=dev-mem
       - KC_HTTP_ENABLED=true
-      - KC_HOSTNAME=${KEYCLOAK_HOST:-keycloak}
+      - KEYCLOAK_EXTERNAL_URL=keycloak-api.joseserver.com
+      - KC_HOSTNAME=keycloak-api.joseserver.com
+      - KC_HOSTNAME_URL=${KEYCLOAK_EXTERNAL_URL}
       - KC_HOSTNAME_STRICT=false
       - KC_HOSTNAME_STRICT_HTTPS=false
+      - KC_HOSTNAME_ADMIN_URL=${KEYCLOAK_EXTERNAL_URL}
+      - KC_HTTP_RELATIVE_PATH=/
       - KC_PROXY=edge
       - KC_HOSTNAME_STRICT_BACKCHANNEL=false
     ports:
@@ -138,6 +142,8 @@ services:
       - hello
     environment:
       - NODE_ENV=development
+    env_file:
+      - ./frontend/.env.local
 
 networks:
   demo-network:

@@ -7,8 +7,6 @@ const handler = NextAuth({
       clientId: process.env.KEYCLOAK_CLIENT_ID || 'nextjs-app',
       clientSecret: process.env.KEYCLOAK_CLIENT_SECRET || '',
       issuer: process.env.KEYCLOAK_ISSUER || 'http://localhost:8080/realms/master',
-      // Override the wellKnown endpoint to use the public URL
-      wellKnown: `${process.env.KEYCLOAK_ISSUER || 'http://localhost:8080/realms/master'}/.well-known/openid-configuration`,
       authorization: {
         params: {
           scope: 'openid email profile'
