@@ -1,4 +1,4 @@
-.PHONY: all start stop restart logs ps setup-clients setup-consent-store setup show-secrets clean-clients configure-google-auth
+.PHONY: all start start-backend start-frontend stop restart logs ps setup-clients setup-consent-store setup show-secrets clean-clients configure-google-auth
 
 # Default target - runs complete setup
 all: setup show-secrets
@@ -23,6 +23,21 @@ start:
 	done
 	@echo "Keycloak is ready!"
 	@./configure-keycloak.sh
+
+start-backend:
+	@echo "Starting backend services (excluding frontend)..."
+	@docker-compose up -d keycloak consent-store banking-service hello service-a
+	@echo "Waiting for Keycloak to be ready..."
+	@until curl -sf http://localhost:$${KEYCLOAK_PORT:-8080}/ > /dev/null 2>&1; do \
+		echo "Keycloak is not ready yet..."; \
+		sleep 5; \
+	done
+	@echo "Keycloak is ready!"
+	@./configure-keycloak.sh
+
+start-frontend:
+	@echo "Starting frontend with finalized client secrets..."
+	@docker-compose up -d frontend
 
 stop:
 	docker-compose down
@@ -98,7 +113,10 @@ setup-consent-store:
 	@echo "----------------------------------------"
 	@echo "✓ Consent store setup complete"
 
-setup: start setup-clients setup-consent-store
+wait-for-consent-ui:
+	./wait-for-frontend.sh
+
+setup: start-backend setup-clients setup-consent-store start-frontend wait-for-consent-ui
 	@echo ""
 	@echo "========================================="
 	@echo "✓ Full setup complete!"

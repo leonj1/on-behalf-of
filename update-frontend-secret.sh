@@ -36,9 +36,13 @@ if [ -n "$CLIENT_UUID" ]; then
       rm -f frontend/.env.local.bak
       echo "✓ Updated frontend/.env.local with new client secret"
       
-      # Restart frontend to apply changes
-      docker-compose restart frontend > /dev/null 2>&1
-      echo "✓ Restarted frontend service"
+      # Restart frontend to apply changes (only if it's running)
+      if docker ps --format "table {{.Names}}" | grep -q "^frontend$"; then
+        docker-compose restart frontend > /dev/null 2>&1
+        echo "✓ Restarted frontend service"
+      else
+        echo "✓ Frontend not running yet - changes will apply when started"
+      fi
     else
       echo "✗ frontend/.env.local not found"
       exit 1
