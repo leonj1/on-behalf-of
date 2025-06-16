@@ -15,10 +15,18 @@ docker exec keycloak /opt/keycloak/bin/kcadm.sh config credentials \
 CLIENT_UUID=$(docker exec keycloak /opt/keycloak/bin/kcadm.sh get clients -r master --fields id,clientId | jq -r '.[] | select(.clientId=="nextjs-app") | .id')
 
 if [ -n "$CLIENT_UUID" ]; then
-  # Update redirect URIs to include port 3005 and external IP
+  # Load configuration
+  if [ -f .env ]; then
+    source .env
+    FRONTEND_URL="${FRONTEND_EXTERNAL_URL:-http://localhost:3005}"
+  else
+    FRONTEND_URL="http://localhost:3005"
+  fi
+  
+  # Update redirect URIs to include configured frontend URL
   docker exec keycloak /opt/keycloak/bin/kcadm.sh update clients/$CLIENT_UUID -r master \
-    -s 'redirectUris=["http://localhost:3005/*","http://localhost:3000/*","http://10.1.1.74:3005/*"]' \
-    -s 'webOrigins=["http://localhost:3005","http://localhost:3000","http://10.1.1.74:3005"]'
+    -s "redirectUris=[\"${FRONTEND_URL}/*\",\"http://localhost:3005/*\",\"http://localhost:3000/*\"]" \
+    -s "webOrigins=[\"${FRONTEND_URL}\",\"http://localhost:3005\",\"http://localhost:3000\"]"
   
   echo "✓ Updated nextjs-app client redirect URIs"
 else

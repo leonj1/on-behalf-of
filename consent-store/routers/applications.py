@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Response
 from typing import List
 from models.schemas import (
     ApplicationCreate, ApplicationResponse, ApplicationWithCapabilities,
@@ -7,6 +7,20 @@ from models.schemas import (
 from database.repository import DatabaseRepository
 
 router = APIRouter(prefix="/applications", tags=["applications"])
+
+# Add OPTIONS handler for all applications routes
+@router.options("/{path:path}")
+async def applications_options_handler(path: str):
+    """Handle preflight OPTIONS requests for applications routes"""
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Max-Age": "3600",
+        }
+    )
 
 def get_repository() -> DatabaseRepository:
     import consent_store
@@ -25,8 +39,13 @@ def create_application(app: ApplicationCreate, db: DatabaseRepository = Depends(
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("", response_model=List[ApplicationResponse])
-def list_applications(db: DatabaseRepository = Depends(get_repository)):
+def list_applications(response: Response, db: DatabaseRepository = Depends(get_repository)):
     """List all applications"""
+    # Add CORS headers directly
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    
     apps = db.list_applications()
     return [ApplicationResponse(**app) for app in apps]
 

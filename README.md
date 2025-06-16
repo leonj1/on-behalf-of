@@ -200,18 +200,47 @@ git clone <repository-url>
 cd on-behalf-of-demo
 ```
 
-2. Stop any existing services and start the full stack:
+2. **Setup Process (3 Steps)**:
+
+   **Step 1: Stop any existing services**
+   ```bash
+   make stop
+   ```
+
+   **Step 2: Configure the services** (optional but recommended)
+   ```bash
+   ./setup-env.sh
+   ```
+   This will prompt you to configure:
+   - Local service hosts and ports
+   - External IP addresses for remote access
+   - Keycloak configuration
+   - Frontend environment settings
+
+   **Step 3: Start and setup all services**
+   ```bash
+   make setup
+   ```
+   This command will:
+   - Start backend services (Keycloak, consent-store, etc.)
+   - Configure Keycloak clients automatically
+   - Update frontend with correct client secrets (no race conditions)
+   - Start frontend with finalized configuration
+   - Set up the consent store with applications and capabilities
+   - Wait for all services to come online
+
+### Alternative Configuration Options
+
+**Option 1: Use Default Configuration**
+- Skip step 2 - works out of the box with default IPs and ports
+
+**Option 2: Manual Configuration**
 ```bash
-make stop all
+cp .env.example .env
+# Edit .env file with your specific IP addresses and ports
 ```
 
-This command will:
-- Stop any running containers
-- Start all services (Keycloak, microservices, frontend)
-- Configure Keycloak clients automatically
-- Set up the consent store with applications and capabilities
-- Display all client secrets
-- Create a test user (username: `testuser`, password: `testpass123`)
+For detailed configuration options and examples, see [CONFIGURATION.md](CONFIGURATION.md).
 
 3. Access the services:
 - **Frontend**: http://localhost:3005 or http://10.1.1.74:3005
@@ -244,22 +273,28 @@ This grants consent for both admin and testuser to allow service-a to perform wi
 ## Useful Commands
 
 ```bash
-# Start all services
-make all
+# Complete setup (recommended workflow)
+make stop               # Stop existing services
+./setup-env.sh         # Configure environment (optional)
+make setup              # Start and configure all services
 
-# View logs
-make logs
+# Alternative commands
+make all                # Quick start with defaults + show secrets
+make start              # Start all services only (no configuration)
 
-# Show client secrets
-make show-secrets
+# Maintenance commands
+make logs               # View logs
+make show-secrets       # Show client secrets
+make stop               # Stop all services
+make restart            # Stop and start all services
 
-# Stop all services
-make stop
+# Development commands
+make start-backend      # Start only backend services
+make start-frontend     # Start only frontend
+make setup-clients      # Configure Keycloak clients only
+make setup-consent-store # Configure consent store only
 
-# Restart services
-make restart
-
-# Configure Google authentication (optional)
+# Optional features
 make configure-google-auth GOOGLE_CLIENT_ID=your-id GOOGLE_CLIENT_SECRET=your-secret
 ```
 

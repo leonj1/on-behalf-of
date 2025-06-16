@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
+import { config } from '@/lib/config'
 
 interface Consent {
   id: number
@@ -41,7 +42,7 @@ export function UserConsent() {
     console.log('Fetching consents for user ID:', userId)
     
     try {
-      const response = await fetch(`http://10.1.1.74:8001/consent/user/${userId}`)
+      const response = await fetch(`${config.consentStoreUrl}/consent/user/${userId}`)
       if (response.ok) {
         const data = await response.json()
         setConsents(data)
@@ -61,13 +62,13 @@ export function UserConsent() {
 
   const fetchApplications = async () => {
     try {
-      const response = await fetch('http://10.1.1.74:8001/applications')
+      const response = await fetch(`${config.consentStoreUrl}/applications`)
       if (response.ok) {
         const apps = await response.json()
         // Fetch capabilities for each app
         const appsWithCapabilities = await Promise.all(
           apps.map(async (app: any) => {
-            const capResponse = await fetch(`http://10.1.1.74:8001/applications/${app.id}/capabilities`)
+            const capResponse = await fetch(`${config.consentStoreUrl}/applications/${app.id}/capabilities`)
             const capabilities = capResponse.ok ? await capResponse.json() : []
             return { ...app, capabilities }
           })
@@ -85,7 +86,7 @@ export function UserConsent() {
     setSuccess('')
 
     try {
-      const response = await fetch('http://10.1.1.74:8001/consent', {
+      const response = await fetch(`${config.consentStoreUrl}/consent`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -117,7 +118,7 @@ export function UserConsent() {
     setSuccess('')
     
     try {
-      const response = await fetch(`http://10.1.1.74:8001/consent/user/${consent.user_id}/capability`, {
+      const response = await fetch(`${config.consentStoreUrl}/consent/user/${consent.user_id}/capability`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
@@ -152,7 +153,7 @@ export function UserConsent() {
     }
 
     try {
-      const response = await fetch(`http://10.1.1.74:8001/consent/user/${userId}`, {
+      const response = await fetch(`${config.consentStoreUrl}/consent/user/${userId}`, {
         method: 'DELETE'
       })
 

@@ -6,6 +6,18 @@ import httpx
 from typing import Optional
 import secrets
 import os
+from config import (
+    FRONTEND_EXTERNAL_IP,
+    FRONTEND_PORT,
+    EXTERNAL_IP,
+    CONSENT_STORE_INTERNAL_URL,
+    BANKING_SERVICE_EXTERNAL_URL,
+    KEYCLOAK_INTERNAL_URL,
+    KEYCLOAK_REALM,
+    SERVICE_A_CLIENT_SECRET,
+    FRONTEND_EXTERNAL_URL,
+    SERVICE_A_PORT
+)
 
 app = FastAPI(
     title="Service A",
@@ -16,7 +28,15 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://localhost:3005", "http://10.1.1.74:3005", "http://100.68.45.127:3005"],
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://localhost:3001", 
+        "http://localhost:3005", 
+        f"http://{FRONTEND_EXTERNAL_IP}:{FRONTEND_PORT}", 
+        f"http://{EXTERNAL_IP}:{FRONTEND_PORT}",
+        FRONTEND_EXTERNAL_URL,
+        "https://consent.joseserver.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -26,15 +46,15 @@ app.add_middleware(
 security = HTTPBearer()
 
 # Configuration
-CONSENT_STORE_URL = "http://consent-store:8001"
-BANKING_SERVICE_URL = "http://banking-service:8012"
+CONSENT_STORE_URL = os.getenv("CONSENT_STORE_INTERNAL_URL", "http://consent-store:8001")
+BANKING_SERVICE_URL = BANKING_SERVICE_EXTERNAL_URL
 SERVICE_NAME = "service-a"
 
 # Keycloak configuration
-KEYCLOAK_URL = os.getenv("KEYCLOAK_URL", "http://keycloak:8080")
-KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM", "master")
+KEYCLOAK_URL = os.getenv("KEYCLOAK_URL", KEYCLOAK_INTERNAL_URL)
+KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM", KEYCLOAK_REALM)
 CLIENT_ID = os.getenv("CLIENT_ID", "service-a")
-CLIENT_SECRET = os.getenv("CLIENT_SECRET", "")  # Should be set via environment variable
+CLIENT_SECRET = os.getenv("CLIENT_SECRET", SERVICE_A_CLIENT_SECRET)  # Should be set via environment variable
 
 async def get_user_info(credentials: HTTPAuthorizationCredentials = Depends(security)):
     """Extract user info from JWT token"""
@@ -198,13 +218,13 @@ async def withdraw(user_info: dict = Depends(get_user_info)):
                     "withdraw": "Allow withdrawal of funds from your bank account"
                 },
                 "client_id": "nextjs-app",
-                "consent_ui_url": "http://100.68.45.127:8012/consent",
+                "consent_ui_url": f"{BANKING_SERVICE_EXTERNAL_URL}/consent",
                 "consent_params": {
                     "requesting_service": "service-a",
                     "requesting_service_name": "Service A",
                     "destination_service": "service-b",
                     "operations": "withdraw",  # This will be passed as-is in URL
-                    "redirect_uri": "http://10.1.1.74:3005/consent-callback",
+                    "redirect_uri": f"{FRONTEND_EXTERNAL_URL}/consent-callback",
                     "state": state_token
                 }
             }
@@ -258,4 +278,4 @@ async def withdraw(user_info: dict = Depends(get_user_info)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8004)
+    uvicorn.run(app, host="0.0.0.0", port=SERVICE_A_PORT)
