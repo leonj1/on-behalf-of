@@ -4,7 +4,8 @@ from config import (
     FRONTEND_EXTERNAL_IP,
     FRONTEND_PORT,
     EXTERNAL_IP,
-    HELLO_SERVICE_PORT
+    HELLO_SERVICE_PORT,
+    FRONTEND_EXTERNAL_URL
 )
 
 app = FastAPI(
@@ -16,7 +17,15 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://localhost:3005", f"http://{FRONTEND_EXTERNAL_IP}:{FRONTEND_PORT}", f"http://{EXTERNAL_IP}:{FRONTEND_PORT}"],
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://localhost:3001", 
+        "http://localhost:3005", 
+        f"http://{FRONTEND_EXTERNAL_IP}:{FRONTEND_PORT}", 
+        f"http://{EXTERNAL_IP}:{FRONTEND_PORT}",
+        FRONTEND_EXTERNAL_URL,
+        "https://consent.joseserver.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

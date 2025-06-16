@@ -54,7 +54,7 @@ def test_nextjs_app_authentication():
     print("-" * 50)
     
     # Get the current client secret from frontend config
-    client_secret = "zKpNd0k5w8gfNftSEQh0ZbH8COTMvkwJ"  # From the updated .env.local
+    client_secret = "Ao3lIewRSozmdoNbzhH3TpiwrpUoD0AJ"  # From the updated .env.local
     
     try:
         # Test password grant with nextjs-app client
