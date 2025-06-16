@@ -24,12 +24,14 @@ The application will work with default values if no .env file is present.
 
 ## Environment Variables
 
+**Note**: Variables with `CHANGE_ME_*` values are placeholder values that must be replaced with your actual IP addresses before deployment.
+
 ### Core Services
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `FRONTEND_PORT` | `3005` | Port for the frontend application |
-| `BANKING_SERVICE_HOST` | `100.68.45.127` | Host for banking service |
+| `BANKING_SERVICE_HOST` | `CHANGE_ME_IP` | Host for banking service |
 | `BANKING_SERVICE_PORT` | `8012` | Port for banking service |
 | `SERVICE_A_HOST` | `localhost` | Host for service A (main API) |
 | `SERVICE_A_PORT` | `8004` | Port for service A |
@@ -51,8 +53,8 @@ The application will work with default values if no .env file is present.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `EXTERNAL_IP` | `100.68.45.127` | External IP for the host |
-| `FRONTEND_EXTERNAL_IP` | `10.1.1.74` | External IP for frontend access |
+| `EXTERNAL_IP` | `CHANGE_ME_IP` | External IP for the host |
+| `FRONTEND_EXTERNAL_IP` | `CHANGE_ME_FRONTEND_IP` | External IP for frontend access |
 | `FRONTEND_EXTERNAL_URL` | Auto-generated | Full external URL for frontend |
 | `BANKING_SERVICE_EXTERNAL_URL` | Auto-generated | External URL for banking service |
 | `CONSENT_STORE_INTERNAL_URL` | `http://consent-store:8001` | Internal URL for consent store |
@@ -63,7 +65,7 @@ The application will work with default values if no .env file is present.
 |----------|---------|-------------|
 | `VITE_API_BASE_URL` | `http://localhost:8004` | Base URL for API calls |
 | `VITE_SERVICE_A_URL` | `http://localhost:8004` | Service A URL |
-| `VITE_BANKING_SERVICE_URL` | `http://100.68.45.127:8012` | Banking service URL |
+| `VITE_BANKING_SERVICE_URL` | `http://CHANGE_ME_IP:8012` | Banking service URL |
 | `VITE_CONSENT_STORE_URL` | `http://localhost:8001` | Consent store URL |
 | `VITE_HELLO_SERVICE_URL` | `http://localhost:8003` | Hello service URL |
 
