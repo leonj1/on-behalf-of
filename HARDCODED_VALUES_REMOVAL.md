@@ -58,6 +58,7 @@ This document tracks the progress of removing hardcoded IP addresses, localhost 
 - [x] Add environment variable configuration for each service
 - [x] Update service dependencies and links
 - [x] Remove hardcoded IP fallbacks from environment variables
+- [x] Remove all Docker service URL fallbacks (CONSENT_STORE_INTERNAL_URL, KEYCLOAK_INTERNAL_URL)
 
 ### Makefile
 - [x] Already uses environment variables properly

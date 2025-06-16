@@ -45,7 +45,7 @@ The application will work with default values if no .env file is present.
 | `KEYCLOAK_HOST` | `100.68.45.127` | Host for Keycloak server |
 | `KEYCLOAK_PORT` | `8080` | Port for Keycloak server |
 | `KEYCLOAK_REALM` | `master` | Keycloak realm name |
-| `KEYCLOAK_INTERNAL_URL` | Auto-generated | Internal Keycloak URL for services |
+| `KEYCLOAK_INTERNAL_URL` | `http://keycloak:8080` | Internal Keycloak URL for services |
 
 ### External URLs (for cross-service communication)
 
@@ -55,7 +55,7 @@ The application will work with default values if no .env file is present.
 | `FRONTEND_EXTERNAL_IP` | `10.1.1.74` | External IP for frontend access |
 | `FRONTEND_EXTERNAL_URL` | Auto-generated | Full external URL for frontend |
 | `BANKING_SERVICE_EXTERNAL_URL` | Auto-generated | External URL for banking service |
-| `CONSENT_STORE_INTERNAL_URL` | Auto-generated | Internal URL for consent store |
+| `CONSENT_STORE_INTERNAL_URL` | `http://consent-store:8001` | Internal URL for consent store |
 
 ### Frontend Configuration
 
