@@ -1,0 +1,50 @@
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Frontend Configuration
+FRONTEND_PORT = int(os.getenv('FRONTEND_PORT', '3005'))
+
+# Banking Service Configuration
+BANKING_SERVICE_HOST = os.getenv('BANKING_SERVICE_HOST', '100.68.45.127')
+BANKING_SERVICE_PORT = int(os.getenv('BANKING_SERVICE_PORT', '8012'))
+BANKING_SERVICE_URL = f"http://{BANKING_SERVICE_HOST}:{BANKING_SERVICE_PORT}"
+BANKING_SERVICE_EXTERNAL_URL = os.getenv('BANKING_SERVICE_EXTERNAL_URL', BANKING_SERVICE_URL)
+
+# Service A Configuration
+SERVICE_A_HOST = os.getenv('SERVICE_A_HOST', 'localhost')
+SERVICE_A_PORT = int(os.getenv('SERVICE_A_PORT', '8004'))
+SERVICE_A_URL = f"http://{SERVICE_A_HOST}:{SERVICE_A_PORT}"
+
+# Consent Store Configuration
+CONSENT_STORE_HOST = os.getenv('CONSENT_STORE_HOST', 'localhost')
+CONSENT_STORE_PORT = int(os.getenv('CONSENT_STORE_PORT', '8001'))
+CONSENT_STORE_URL = f"http://{CONSENT_STORE_HOST}:{CONSENT_STORE_PORT}"
+CONSENT_STORE_INTERNAL_URL = os.getenv('CONSENT_STORE_INTERNAL_URL', CONSENT_STORE_URL)
+
+# Hello Service Configuration
+HELLO_SERVICE_HOST = os.getenv('HELLO_SERVICE_HOST', 'localhost')
+HELLO_SERVICE_PORT = int(os.getenv('HELLO_SERVICE_PORT', '8003'))
+HELLO_SERVICE_URL = f"http://{HELLO_SERVICE_HOST}:{HELLO_SERVICE_PORT}"
+
+# LLM Proxy Configuration
+LLM_PROXY_HOST = os.getenv('LLM_PROXY_HOST', 'localhost')
+LLM_PROXY_PORT = int(os.getenv('LLM_PROXY_PORT', '8012'))
+LLM_PROXY_URL = f"http://{LLM_PROXY_HOST}:{LLM_PROXY_PORT}"
+
+# Keycloak Configuration
+KEYCLOAK_HOST = os.getenv('KEYCLOAK_HOST', '100.68.45.127')
+KEYCLOAK_PORT = int(os.getenv('KEYCLOAK_PORT', '8080'))
+KEYCLOAK_URL = f"http://{KEYCLOAK_HOST}:{KEYCLOAK_PORT}"
+KEYCLOAK_INTERNAL_URL = os.getenv('KEYCLOAK_INTERNAL_URL', KEYCLOAK_URL)
+KEYCLOAK_REALM = os.getenv('KEYCLOAK_REALM', 'master')
+
+# External IP Configuration
+EXTERNAL_IP = os.getenv('EXTERNAL_IP', '100.68.45.127')
+FRONTEND_EXTERNAL_IP = os.getenv('FRONTEND_EXTERNAL_IP', '10.1.1.74')
+FRONTEND_EXTERNAL_URL = os.getenv('FRONTEND_EXTERNAL_URL', f"http://{FRONTEND_EXTERNAL_IP}:{FRONTEND_PORT}")
+
+# Client Configuration
+SERVICE_A_CLIENT_SECRET = os.getenv('SERVICE_A_CLIENT_SECRET', 'DD30NUl7MKHNzOsLc0YwEc9KUNkL8DtM')

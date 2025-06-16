@@ -39,8 +39,8 @@ def create_client(keycloak_url, realm, client_id, token):
         'protocol': 'openid-connect',
         'publicClient': False,
         'clientAuthenticatorType': 'client-secret',
-        'redirectUris': ['http://localhost:3000/*'],
-        'webOrigins': ['http://localhost:3000'],
+        'redirectUris': ['http://localhost:3000/*', f"http://{os.getenv('FRONTEND_EXTERNAL_IP', '10.1.1.74')}:{os.getenv('FRONTEND_PORT', '3005')}/*"],
+        'webOrigins': ['http://localhost:3000', f"http://{os.getenv('FRONTEND_EXTERNAL_IP', '10.1.1.74')}:{os.getenv('FRONTEND_PORT', '3005')}"],
         'standardFlowEnabled': True,
         'directAccessGrantsEnabled': True,
         'serviceAccountsEnabled': True,
@@ -92,8 +92,8 @@ def create_client(keycloak_url, realm, client_id, token):
 def main():
     parser = argparse.ArgumentParser(description='Create a client in Keycloak')
     parser.add_argument('--client-id', required=True, help='Client ID to create')
-    parser.add_argument('--keycloak-url', default='http://localhost:8080', 
-                        help='Keycloak URL (default: http://localhost:8080)')
+    parser.add_argument('--keycloak-url', default=os.getenv('KEYCLOAK_EXTERNAL_URL', 'http://localhost:8080'), 
+                        help='Keycloak URL (default: from KEYCLOAK_EXTERNAL_URL env or http://localhost:8080)')
     parser.add_argument('--realm', default='master', 
                         help='Keycloak realm (default: master)')
     parser.add_argument('--admin-username', default='admin',

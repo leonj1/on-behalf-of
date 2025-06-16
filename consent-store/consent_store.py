@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from database.sqlite_repository import SQLiteRepository
 from database.repository import DatabaseRepository
 from routers import applications, consent
+import sys
+sys.path.append('/app')  # Add app directory to path
+from config import *
 
 # Initialize the database repository
 _db_repository: DatabaseRepository = None
@@ -23,7 +26,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://localhost:3005", "http://10.1.1.74:3005", "http://100.68.45.127:3005"],
+    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://localhost:3005", f"http://{FRONTEND_EXTERNAL_IP}:{FRONTEND_PORT}", f"http://{EXTERNAL_IP}:{FRONTEND_PORT}"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -43,4 +46,4 @@ def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=CONSENT_STORE_PORT)

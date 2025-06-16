@@ -213,6 +213,26 @@ This command will:
 - Display all client secrets
 - Create a test user (username: `testuser`, password: `testpass123`)
 
+### Configuration
+
+The application supports flexible configuration for different deployment environments:
+
+**Option 1: Use Default Configuration**
+- No setup required - works out of the box with default IPs and ports
+
+**Option 2: Interactive Configuration**
+```bash
+./setup-env.sh
+```
+
+**Option 3: Manual Configuration**
+```bash
+cp .env.example .env
+# Edit .env file with your specific IP addresses and ports
+```
+
+For detailed configuration options and examples, see [CONFIGURATION.md](CONFIGURATION.md).
+
 3. Access the services:
 - **Frontend**: http://localhost:3005 or http://10.1.1.74:3005
 - **Keycloak Admin**: http://localhost:8080 (admin/admin)

@@ -8,8 +8,8 @@ all: setup show-secrets
 	@echo "========================================="
 	@echo ""
 	@echo "Next steps:"
-	@echo "1. Access Keycloak admin: http://100.68.45.127:8080 (admin/admin)"
-	@echo "2. Access Frontend: http://localhost:3005"
+	@echo "1. Access Keycloak admin: http://$${EXTERNAL_IP:-100.68.45.127}:$${KEYCLOAK_PORT:-8080} (admin/admin)"
+	@echo "2. Access Frontend: http://$${FRONTEND_EXTERNAL_IP:-10.1.1.74}:$${FRONTEND_PORT:-3005}"
 	@echo "3. View logs: make logs"
 	@echo ""
 	@echo "For client credentials, run: make show-secrets"
@@ -17,7 +17,7 @@ all: setup show-secrets
 start:
 	docker compose up -d
 	@echo "Waiting for Keycloak to be ready..."
-	@until curl -sf http://localhost:8080/ > /dev/null 2>&1; do \
+	@until curl -sf http://localhost:$${KEYCLOAK_PORT:-8080}/ > /dev/null 2>&1; do \
 		echo "Keycloak is not ready yet..."; \
 		sleep 5; \
 	done
@@ -59,30 +59,30 @@ setup-consent-store:
 	@echo "Setting up consent store applications..."
 	@echo "----------------------------------------"
 	@echo "Waiting for consent-store to be ready..."
-	@until curl -sf http://localhost:8001/health > /dev/null 2>&1; do \
+	@until curl -sf http://localhost:$${CONSENT_STORE_PORT:-8001}/health > /dev/null 2>&1; do \
 		echo "Consent store is not ready yet..."; \
 		sleep 2; \
 	done
 	@echo "✓ Consent store is ready"
 	@echo ""
 	@echo "Registering applications..."
-	@curl -s -X POST http://localhost:8001/applications \
+	@curl -s -X POST http://localhost:$${CONSENT_STORE_PORT:-8001}/applications \
 		-H "Content-Type: application/json" \
 		-d '{"name": "service-a"}' > /dev/null && echo "✓ Registered service-a" || echo "⚠ service-a may already exist"
-	@curl -s -X POST http://localhost:8001/applications \
+	@curl -s -X POST http://localhost:$${CONSENT_STORE_PORT:-8001}/applications \
 		-H "Content-Type: application/json" \
 		-d '{"name": "service-b"}' > /dev/null && echo "✓ Registered service-b" || echo "⚠ service-b may already exist"
 	@echo ""
 	@echo "Adding capabilities..."
-	@APP_ID=$$(curl -s http://localhost:8001/applications | jq -r '.[] | select(.name=="service-b") | .id'); \
+	@APP_ID=$$(curl -s http://localhost:$${CONSENT_STORE_PORT:-8001}/applications | jq -r '.[] | select(.name=="service-b") | .id'); \
 	if [ -n "$$APP_ID" ]; then \
-		curl -s -X PUT http://localhost:8001/applications/$$APP_ID/capabilities \
+		curl -s -X PUT http://localhost:$${CONSENT_STORE_PORT:-8001}/applications/$$APP_ID/capabilities \
 			-H "Content-Type: application/json" \
 			-d '{"capability": "withdraw"}' > /dev/null && echo "✓ Added 'withdraw' capability to service-b"; \
-		curl -s -X PUT http://localhost:8001/applications/$$APP_ID/capabilities \
+		curl -s -X PUT http://localhost:$${CONSENT_STORE_PORT:-8001}/applications/$$APP_ID/capabilities \
 			-H "Content-Type: application/json" \
 			-d '{"capability": "view_balance"}' > /dev/null && echo "✓ Added 'view_balance' capability to service-b"; \
-		curl -s -X PUT http://localhost:8001/applications/$$APP_ID/capabilities \
+		curl -s -X PUT http://localhost:$${CONSENT_STORE_PORT:-8001}/applications/$$APP_ID/capabilities \
 			-H "Content-Type: application/json" \
 			-d '{"capability": "transfer"}' > /dev/null && echo "✓ Added 'transfer' capability to service-b"; \
 	else \
@@ -98,12 +98,12 @@ setup: start setup-clients setup-consent-store
 	@echo "========================================="
 	@echo ""
 	@echo "Services available at:"
-	@echo "  - Keycloak:      http://100.68.45.127:8080 (admin/admin)"
-	@echo "  - Consent Store: http://localhost:8001"
-	@echo "  - Banking Service: http://localhost:8012"
-	@echo "  - Hello Service: http://localhost:8003"
-	@echo "  - Service A:     http://localhost:8004"
-	@echo "  - Frontend:      http://localhost:3005"
+	@echo "  - Keycloak:      http://$${EXTERNAL_IP:-100.68.45.127}:$${KEYCLOAK_PORT:-8080} (admin/admin)"
+	@echo "  - Consent Store: http://localhost:$${CONSENT_STORE_PORT:-8001}"
+	@echo "  - Banking Service: http://localhost:$${BANKING_SERVICE_PORT:-8012}"
+	@echo "  - Hello Service: http://localhost:$${HELLO_SERVICE_PORT:-8003}"
+	@echo "  - Service A:     http://localhost:$${SERVICE_A_PORT:-8004}"
+	@echo "  - Frontend:      http://$${FRONTEND_EXTERNAL_IP:-10.1.1.74}:$${FRONTEND_PORT:-3005}"
 	@echo ""
 	@echo "To view logs: make logs"
 	@echo "To stop all services: make stop"
@@ -112,7 +112,7 @@ show-secrets:
 	@echo "Fetching client secrets from Keycloak..."
 	@echo "========================================="
 	@docker exec keycloak /opt/keycloak/bin/kcadm.sh config credentials \
-		--server http://localhost:8080 \
+		--server http://localhost:$${KEYCLOAK_PORT:-8080} \
 		--realm master \
 		--user admin \
 		--password admin \
@@ -146,7 +146,7 @@ clean-clients:
 	@echo "Cleaning up Keycloak clients and consent store data..."
 	@echo "----------------------------------------"
 	@docker exec keycloak /opt/keycloak/bin/kcadm.sh config credentials \
-		--server http://localhost:8080 \
+		--server http://localhost:$${KEYCLOAK_PORT:-8080} \
 		--realm master \
 		--user admin \
 		--password admin \
@@ -159,11 +159,11 @@ clean-clients:
 	done
 	@echo ""
 	@echo "Cleaning consent store..."
-	@if curl -sf http://localhost:8001/health > /dev/null 2>&1; then \
-		curl -s -X DELETE http://localhost:8001/consent/all > /dev/null && echo "✓ Cleared all consents"; \
-		APPS=$$(curl -s http://localhost:8001/applications | jq -r '.[] | .id'); \
+	@if curl -sf http://localhost:$${CONSENT_STORE_PORT:-8001}/health > /dev/null 2>&1; then \
+		curl -s -X DELETE http://localhost:$${CONSENT_STORE_PORT:-8001}/consent/all > /dev/null && echo "✓ Cleared all consents"; \
+		APPS=$$(curl -s http://localhost:$${CONSENT_STORE_PORT:-8001}/applications | jq -r '.[] | .id'); \
 		for app_id in $$APPS; do \
-			curl -s -X DELETE http://localhost:8001/applications/$$app_id > /dev/null && echo "✓ Deleted application ID: $$app_id"; \
+			curl -s -X DELETE http://localhost:$${CONSENT_STORE_PORT:-8001}/applications/$$app_id > /dev/null && echo "✓ Deleted application ID: $$app_id"; \
 		done; \
 	else \
 		echo "⚠ Consent store not available"; \
@@ -183,8 +183,8 @@ configure-google-auth:
 		echo "3. Enable Google+ API"; \
 		echo "4. Create OAuth 2.0 credentials"; \
 		echo "5. Add authorized redirect URIs:"; \
-		echo "   - http://localhost:8080/realms/master/broker/google/endpoint"; \
-		echo "   - http://100.68.45.127:8080/realms/master/broker/google/endpoint"; \
+		echo "   - http://localhost:$${KEYCLOAK_PORT:-8080}/realms/master/broker/google/endpoint"; \
+		echo "   - http://$${EXTERNAL_IP:-100.68.45.127}:$${KEYCLOAK_PORT:-8080}/realms/master/broker/google/endpoint"; \
 		echo ""; \
 		echo "For detailed instructions, see GOOGLE_AUTH_SETUP.md"; \
 		exit 1; \

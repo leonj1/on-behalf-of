@@ -3,17 +3,17 @@ services:
     image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
     environment:
-      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
-      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+      - KC_BOOTSTRAP_ADMIN_USERNAME=${KEYCLOAK_ADMIN_USERNAME:-admin}
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
       - KC_DB=dev-mem
       - KC_HTTP_ENABLED=true
-      - KC_HOSTNAME=100.68.45.127
+      - KC_HOSTNAME=${KEYCLOAK_HOST:-100.68.45.127}
       - KC_HOSTNAME_STRICT=false
       - KC_HOSTNAME_STRICT_HTTPS=false
       - KC_PROXY=edge
       - KC_HOSTNAME_STRICT_BACKCHANNEL=false
     ports:
-      - "8080:8080"
+      - "${KEYCLOAK_PORT:-8080}:8080"
     command: start-dev
     # Healthcheck removed - curl not available in container
     # Health is checked from host in Makefile instead
@@ -24,9 +24,10 @@ services:
     build: ./consent-store
     container_name: consent-store
     ports:
-      - "8001:8001"
+      - "${CONSENT_STORE_PORT:-8001}:8001"
     volumes:
       - ./consent-store-data:/app/data
+      - ./config.py:/app/config.py
     networks:
       - demo-network
     depends_on:
@@ -36,6 +37,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    environment:
+      - PYTHONUNBUFFERED=1
+      - EXTERNAL_IP=${EXTERNAL_IP:-100.68.45.127}
+      - FRONTEND_EXTERNAL_IP=${FRONTEND_EXTERNAL_IP:-10.1.1.74}
+      - FRONTEND_EXTERNAL_URL=${FRONTEND_EXTERNAL_URL:-http://10.1.1.74:3005}
 
   banking-service:
     image: python:3.11-slim
@@ -45,17 +51,23 @@ services:
       sh -c "pip install -r requirements.txt && 
              python banking-service.py"
     ports:
-      - "8012:8012"
+      - "${BANKING_SERVICE_PORT:-8012}:8012"
     volumes:
       - ./banking-service.py:/app/banking-service.py
       - ./requirements.txt:/app/requirements.txt
       - ./banking-service-templates:/app/banking-service-templates
+      - ./config.py:/app/config.py
     networks:
       - demo-network
     depends_on:
       - keycloak
     environment:
       - PYTHONUNBUFFERED=1
+      - EXTERNAL_IP=${EXTERNAL_IP:-100.68.45.127}
+      - FRONTEND_EXTERNAL_IP=${FRONTEND_EXTERNAL_IP:-10.1.1.74}
+      - CONSENT_STORE_INTERNAL_URL=${CONSENT_STORE_INTERNAL_URL:-http://consent-store:8001}
+      - KEYCLOAK_INTERNAL_URL=${KEYCLOAK_INTERNAL_URL:-http://keycloak:8080}
+      - BANKING_SERVICE_PORT=${BANKING_SERVICE_PORT:-8012}
 
   hello:
     image: python:3.11-slim
@@ -65,14 +77,18 @@ services:
       sh -c "pip install -r requirements.txt && 
              python hello.py"
     ports:
-      - "8003:8003"
+      - "${HELLO_SERVICE_PORT:-8003}:8003"
     volumes:
       - ./hello.py:/app/hello.py
       - ./requirements.txt:/app/requirements.txt
+      - ./config.py:/app/config.py
     networks:
       - demo-network
     environment:
       - PYTHONUNBUFFERED=1
+      - EXTERNAL_IP=${EXTERNAL_IP:-100.68.45.127}
+      - FRONTEND_EXTERNAL_IP=${FRONTEND_EXTERNAL_IP:-10.1.1.74}
+      - FRONTEND_EXTERNAL_URL=${FRONTEND_EXTERNAL_URL:-http://10.1.1.74:3005}
 
   service-a:
     image: python:3.11-slim
@@ -82,10 +98,11 @@ services:
       sh -c "pip install -r requirements.txt && 
              python service-a.py"
     ports:
-      - "8004:8004"
+      - "${SERVICE_A_PORT:-8004}:8004"
     volumes:
       - ./service-a.py:/app/service-a.py
       - ./requirements.txt:/app/requirements.txt
+      - ./config.py:/app/config.py
     networks:
       - demo-network
     depends_on:
@@ -93,9 +110,13 @@ services:
       - banking-service
     environment:
       - PYTHONUNBUFFERED=1
-      - CLIENT_SECRET=DD30NUl7MKHNzOsLc0YwEc9KUNkL8DtM
-      - KEYCLOAK_URL=http://keycloak:8080
-      - KEYCLOAK_REALM=master
+      - CLIENT_SECRET=${SERVICE_A_CLIENT_SECRET:-DD30NUl7MKHNzOsLc0YwEc9KUNkL8DtM}
+      - KEYCLOAK_URL=${KEYCLOAK_INTERNAL_URL:-http://keycloak:8080}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM:-master}
+      - EXTERNAL_IP=${EXTERNAL_IP:-100.68.45.127}
+      - FRONTEND_EXTERNAL_IP=${FRONTEND_EXTERNAL_IP:-10.1.1.74}
+      - BANKING_SERVICE_EXTERNAL_URL=${BANKING_SERVICE_EXTERNAL_URL:-http://100.68.45.127:8012}
+      - FRONTEND_EXTERNAL_URL=${FRONTEND_EXTERNAL_URL:-http://10.1.1.74:3005}
 
   frontend:
     image: node:20-alpine
@@ -104,7 +125,7 @@ services:
     command: >
       sh -c "npm install && npm run dev"
     ports:
-      - "3005:3000"
+      - "${FRONTEND_PORT:-3005}:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules

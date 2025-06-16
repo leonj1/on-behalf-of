@@ -9,6 +9,7 @@ from typing import Optional, List
 from datetime import datetime
 from pydantic import BaseModel
 import os
+from config import *
 
 app = FastAPI(
     title="Banking Service",
@@ -29,8 +30,8 @@ app.add_middleware(
 security = HTTPBearer()
 
 # Configuration
-KEYCLOAK_URL = "http://keycloak:8080"
-REALM = "master"
+KEYCLOAK_URL = KEYCLOAK_INTERNAL_URL
+REALM = KEYCLOAK_REALM
 SERVICE_AUDIENCE = "banking-service"
 
 async def get_keycloak_public_key():
@@ -99,7 +100,7 @@ def get_consent_info():
     return {
         "service_id": "service-b",
         "service_name": "Banking Service",
-        "consent_ui_url": "http://100.68.45.127:8012/consent",
+        "consent_ui_url": f"{BANKING_SERVICE_EXTERNAL_URL}/consent",
         "consent_required_endpoints": [
             {
                 "method": "POST",
@@ -230,7 +231,7 @@ async def consent_decision(
                 # Save consent to consent store
                 print(f"Saving consent: {consent_data}")
                 response = await client.post(
-                    "http://consent-store:8001/consent",
+                    f"{CONSENT_STORE_INTERNAL_URL}/consent",
                     json=consent_data
                 )
                 
@@ -252,4 +253,4 @@ async def consent_decision(
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8012)
+    uvicorn.run(app, host="0.0.0.0", port=BANKING_SERVICE_PORT)

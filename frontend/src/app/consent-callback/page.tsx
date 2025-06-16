@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { config } from '@/lib/config'
 
 export default function ConsentCallbackPage() {
   const router = useRouter()
@@ -25,7 +26,7 @@ export default function ConsentCallbackPage() {
       
       // Retry the original withdraw request
       if (session?.accessToken) {
-        fetch('http://10.1.1.74:8004/withdraw', {
+        fetch(`${config.serviceAUrl}/withdraw`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${session.accessToken}`,

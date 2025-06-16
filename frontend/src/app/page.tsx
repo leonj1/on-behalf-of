@@ -2,6 +2,7 @@
 
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { useState, useEffect } from 'react'
+import { config } from '@/lib/config'
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -44,7 +45,7 @@ export default function Home() {
   const callHelloService = async () => {
     setLoading({ ...loading, hello: true })
     try {
-      const response = await fetch('http://10.1.1.74:8003/hello')
+      const response = await fetch(`${config.helloServiceUrl}/hello`)
       const data = await response.text()
       setHelloMessage(data)
       setError('')
@@ -63,7 +64,7 @@ export default function Home() {
 
     setLoading({ ...loading, withdraw: true })
     try {
-      const response = await fetch('http://10.1.1.74:8004/withdraw', {
+      const response = await fetch(`${config.serviceAUrl}/withdraw`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.accessToken}`,
