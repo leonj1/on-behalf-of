@@ -42,7 +42,7 @@ The application will work with default values if no .env file is present.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `KEYCLOAK_HOST` | `100.68.45.127` | Host for Keycloak server |
+| `KEYCLOAK_HOST` | `localhost` | Host for Keycloak server |
 | `KEYCLOAK_PORT` | `8080` | Port for Keycloak server |
 | `KEYCLOAK_REALM` | `master` | Keycloak realm name |
 | `KEYCLOAK_INTERNAL_URL` | `http://keycloak:8080` | Internal Keycloak URL for services |

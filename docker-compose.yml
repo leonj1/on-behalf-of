@@ -7,7 +7,7 @@ services:
       - KC_BOOTSTRAP_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
       - KC_DB=dev-mem
       - KC_HTTP_ENABLED=true
-      - KC_HOSTNAME=${KEYCLOAK_HOST}
+      - KC_HOSTNAME=${KEYCLOAK_HOST:-keycloak}
       - KC_HOSTNAME_STRICT=false
       - KC_HOSTNAME_STRICT_HTTPS=false
       - KC_PROXY=edge
