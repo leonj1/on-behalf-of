@@ -6,7 +6,18 @@ import httpx
 from typing import Optional
 import secrets
 import os
-from config import *
+from config import (
+    FRONTEND_EXTERNAL_IP,
+    FRONTEND_PORT,
+    EXTERNAL_IP,
+    CONSENT_STORE_INTERNAL_URL,
+    BANKING_SERVICE_EXTERNAL_URL,
+    KEYCLOAK_INTERNAL_URL,
+    KEYCLOAK_REALM,
+    SERVICE_A_CLIENT_SECRET,
+    FRONTEND_EXTERNAL_URL,
+    SERVICE_A_PORT
+)
 
 app = FastAPI(
     title="Service A",

@@ -5,7 +5,12 @@ from database.repository import DatabaseRepository
 from routers import applications, consent
 import sys
 sys.path.append('/app')  # Add app directory to path
-from config import *
+from config import (
+    FRONTEND_EXTERNAL_IP,
+    FRONTEND_PORT,
+    EXTERNAL_IP,
+    CONSENT_STORE_PORT
+)
 
 # Initialize the database repository
 _db_repository: DatabaseRepository = None

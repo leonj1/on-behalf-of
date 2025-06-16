@@ -9,7 +9,13 @@ from typing import Optional, List
 from datetime import datetime
 from pydantic import BaseModel
 import os
-from config import *
+from config import (
+    KEYCLOAK_INTERNAL_URL,
+    KEYCLOAK_REALM,
+    BANKING_SERVICE_EXTERNAL_URL,
+    CONSENT_STORE_INTERNAL_URL,
+    BANKING_SERVICE_PORT
+)
 
 app = FastAPI(
     title="Banking Service",

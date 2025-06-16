@@ -61,6 +61,7 @@ This document tracks the progress of removing hardcoded IP addresses, localhost 
 - [x] Remove all Docker service URL fallbacks (CONSENT_STORE_INTERNAL_URL, KEYCLOAK_INTERNAL_URL)
 - [x] Replace KC_HOSTNAME hardcoded IP with Docker service name fallback
 - [x] Replace specific IP addresses in .env.example with generic placeholders
+- [x] Replace wildcard imports with explicit imports in all service files
 
 ### Makefile
 - [x] Already uses environment variables properly
@@ -78,6 +79,14 @@ This document tracks the progress of removing hardcoded IP addresses, localhost 
 - [ ] Test with custom `.env` file
 - [ ] Verify all services can communicate with configured endpoints
 - [ ] Test deployment to a different environment
+
+## Code Quality Improvements
+
+- [x] Replace wildcard imports (`from config import *`) with explicit imports
+- [x] Improve namespace clarity in banking-service.py
+- [x] Improve namespace clarity in service-a.py  
+- [x] Improve namespace clarity in hello.py
+- [x] Improve namespace clarity in consent-store/consent_store.py
 
 ## Final Steps
 
