@@ -88,40 +88,78 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 
     echo
     echo "=== External Access Configuration ==="
-    echo "Configure how external clients will access your services"
+    echo "Configure how external clients will access each service."
+    echo "You can use domain names (e.g., api.example.com) or IP addresses."
+    echo "Leave blank to use the default placeholder values."
     echo
 
-    # External IPs
-    read -p "External IP for backend services [CHANGE_ME_IP]: " EXTERNAL_IP
-    if [ ! -z "$EXTERNAL_IP" ]; then
-        sed -i.bak "s/EXTERNAL_IP=.*/EXTERNAL_IP=$EXTERNAL_IP/" .env
+    # Choose configuration mode
+    echo "Configuration modes:"
+    echo "1) Simple - Use one domain/IP for all services (with different ports)"
+    echo "2) Advanced - Configure each service URL individually"
+    echo
+    read -p "Select mode [1]: " CONFIG_MODE
+    
+    if [ "$CONFIG_MODE" = "2" ]; then
+        # Advanced mode - ask for each service
+        echo
+        echo "--- Authentication Server ---"
+        read -p "External URL for Keycloak [http://CHANGE_ME:8080]: " KEYCLOAK_EXTERNAL_URL
+        if [ ! -z "$KEYCLOAK_EXTERNAL_URL" ]; then
+            sed -i.bak "s|KEYCLOAK_EXTERNAL_URL=.*|KEYCLOAK_EXTERNAL_URL=$KEYCLOAK_EXTERNAL_URL|" .env
+        fi
+
+        echo
+        echo "--- Frontend Application ---"
+        read -p "External URL for Frontend [http://CHANGE_ME:3005]: " FRONTEND_EXTERNAL_URL
+        if [ ! -z "$FRONTEND_EXTERNAL_URL" ]; then
+            sed -i.bak "s|FRONTEND_EXTERNAL_URL=.*|FRONTEND_EXTERNAL_URL=$FRONTEND_EXTERNAL_URL|" .env
+        fi
+
+        echo
+        echo "--- API Services ---"
+        read -p "External URL for Service A (Main API) [http://CHANGE_ME:8004]: " SERVICE_A_EXTERNAL_URL
+        if [ ! -z "$SERVICE_A_EXTERNAL_URL" ]; then
+            sed -i.bak "s|SERVICE_A_EXTERNAL_URL=.*|SERVICE_A_EXTERNAL_URL=$SERVICE_A_EXTERNAL_URL|" .env
+        fi
+
+        read -p "External URL for Banking Service [http://CHANGE_ME:8012]: " BANKING_SERVICE_EXTERNAL_URL
+        if [ ! -z "$BANKING_SERVICE_EXTERNAL_URL" ]; then
+            sed -i.bak "s|BANKING_SERVICE_EXTERNAL_URL=.*|BANKING_SERVICE_EXTERNAL_URL=$BANKING_SERVICE_EXTERNAL_URL|" .env
+        fi
+
+        read -p "External URL for Consent Store API [http://CHANGE_ME:8001]: " CONSENT_STORE_EXTERNAL_URL
+        if [ ! -z "$CONSENT_STORE_EXTERNAL_URL" ]; then
+            sed -i.bak "s|CONSENT_STORE_EXTERNAL_URL=.*|CONSENT_STORE_EXTERNAL_URL=$CONSENT_STORE_EXTERNAL_URL|" .env
+        fi
+
+        read -p "External URL for Hello Service [http://CHANGE_ME:8003]: " HELLO_SERVICE_EXTERNAL_URL
+        if [ ! -z "$HELLO_SERVICE_EXTERNAL_URL" ]; then
+            sed -i.bak "s|HELLO_SERVICE_EXTERNAL_URL=.*|HELLO_SERVICE_EXTERNAL_URL=$HELLO_SERVICE_EXTERNAL_URL|" .env
+        fi
     else
-        EXTERNAL_IP="CHANGE_ME_IP"
-    fi
-
-    read -p "External IP for frontend access [CHANGE_ME_FRONTEND_IP]: " FRONTEND_EXTERNAL_IP
-    if [ ! -z "$FRONTEND_EXTERNAL_IP" ]; then
-        sed -i.bak "s/FRONTEND_EXTERNAL_IP=.*/FRONTEND_EXTERNAL_IP=$FRONTEND_EXTERNAL_IP/" .env
-        # Auto-update FRONTEND_EXTERNAL_URL
-        FRONTEND_PORT_VALUE=$(grep "^FRONTEND_PORT=" .env | cut -d'=' -f2)
-        sed -i.bak "s|FRONTEND_EXTERNAL_URL=.*|FRONTEND_EXTERNAL_URL=http://$FRONTEND_EXTERNAL_IP:${FRONTEND_PORT_VALUE:-3005}|" .env
-    else
-        FRONTEND_EXTERNAL_IP="CHANGE_ME_FRONTEND_IP"
-    fi
-
-    # Keycloak Configuration
-    echo
-    echo "=== Keycloak Configuration ==="
-    echo
-
-    read -p "Keycloak host [localhost]: " KEYCLOAK_HOST
-    if [ ! -z "$KEYCLOAK_HOST" ]; then
-        sed -i.bak "s/KEYCLOAK_HOST=.*/KEYCLOAK_HOST=$KEYCLOAK_HOST/" .env
-    fi
-
-    read -p "Keycloak port [8080]: " KEYCLOAK_PORT
-    if [ ! -z "$KEYCLOAK_PORT" ]; then
-        sed -i.bak "s/KEYCLOAK_PORT=.*/KEYCLOAK_PORT=$KEYCLOAK_PORT/" .env
+        # Simple mode - use one domain/IP for all
+        echo
+        read -p "Domain or IP address for all services [CHANGE_ME]: " BASE_DOMAIN
+        if [ ! -z "$BASE_DOMAIN" ]; then
+            # Get ports from current configuration
+            KEYCLOAK_PORT=$(grep "^KEYCLOAK_PORT=" .env | cut -d'=' -f2 || echo "8080")
+            FRONTEND_PORT=$(grep "^FRONTEND_PORT=" .env | cut -d'=' -f2 || echo "3005")
+            SERVICE_A_PORT=$(grep "^SERVICE_A_PORT=" .env | cut -d'=' -f2 || echo "8004")
+            BANKING_SERVICE_PORT=$(grep "^BANKING_SERVICE_PORT=" .env | cut -d'=' -f2 || echo "8012")
+            CONSENT_STORE_PORT=$(grep "^CONSENT_STORE_PORT=" .env | cut -d'=' -f2 || echo "8001")
+            HELLO_SERVICE_PORT=$(grep "^HELLO_SERVICE_PORT=" .env | cut -d'=' -f2 || echo "8003")
+            
+            # Update all external URLs
+            sed -i.bak "s|KEYCLOAK_EXTERNAL_URL=.*|KEYCLOAK_EXTERNAL_URL=http://$BASE_DOMAIN:$KEYCLOAK_PORT|" .env
+            sed -i.bak "s|FRONTEND_EXTERNAL_URL=.*|FRONTEND_EXTERNAL_URL=http://$BASE_DOMAIN:$FRONTEND_PORT|" .env
+            sed -i.bak "s|SERVICE_A_EXTERNAL_URL=.*|SERVICE_A_EXTERNAL_URL=http://$BASE_DOMAIN:$SERVICE_A_PORT|" .env
+            sed -i.bak "s|BANKING_SERVICE_EXTERNAL_URL=.*|BANKING_SERVICE_EXTERNAL_URL=http://$BASE_DOMAIN:$BANKING_SERVICE_PORT|" .env
+            sed -i.bak "s|CONSENT_STORE_EXTERNAL_URL=.*|CONSENT_STORE_EXTERNAL_URL=http://$BASE_DOMAIN:$CONSENT_STORE_PORT|" .env
+            sed -i.bak "s|HELLO_SERVICE_EXTERNAL_URL=.*|HELLO_SERVICE_EXTERNAL_URL=http://$BASE_DOMAIN:$HELLO_SERVICE_PORT|" .env
+            
+            echo "✅ All services configured to use $BASE_DOMAIN"
+        fi
     fi
 
     # Clean up backup files
@@ -138,29 +176,47 @@ echo
 echo "Configuring frontend environment..."
 if [ -f frontend/.env.local ]; then
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        # Update frontend .env.local with the values from .env
-        EXTERNAL_IP_VALUE=$(grep "^EXTERNAL_IP=" .env | cut -d'=' -f2)
-        FRONTEND_EXTERNAL_IP_VALUE=$(grep "^FRONTEND_EXTERNAL_IP=" .env | cut -d'=' -f2)
+        # Update frontend .env.local with the service URLs from .env
+        echo "Updating frontend configuration with service URLs..."
         
-        if [ "$EXTERNAL_IP_VALUE" != "CHANGE_ME_IP" ] && [ ! -z "$EXTERNAL_IP_VALUE" ]; then
-            sed -i.bak "s/CHANGE_ME_IP/$EXTERNAL_IP_VALUE/g" frontend/.env.local
+        # Extract service URLs
+        KEYCLOAK_URL=$(grep "^KEYCLOAK_EXTERNAL_URL=" .env | cut -d'=' -f2)
+        FRONTEND_URL=$(grep "^FRONTEND_EXTERNAL_URL=" .env | cut -d'=' -f2)
+        SERVICE_A_URL=$(grep "^SERVICE_A_EXTERNAL_URL=" .env | cut -d'=' -f2)
+        CONSENT_STORE_URL=$(grep "^CONSENT_STORE_EXTERNAL_URL=" .env | cut -d'=' -f2)
+        HELLO_SERVICE_URL=$(grep "^HELLO_SERVICE_EXTERNAL_URL=" .env | cut -d'=' -f2)
+        
+        # Update frontend .env.local with actual URLs
+        if [ ! -z "$KEYCLOAK_URL" ] && [ "$KEYCLOAK_URL" != "http://CHANGE_ME:8080" ]; then
+            # Update KEYCLOAK_ISSUER_PUBLIC
+            sed -i.bak "s|KEYCLOAK_ISSUER_PUBLIC=.*|KEYCLOAK_ISSUER_PUBLIC=$KEYCLOAK_URL/realms/master|" frontend/.env.local
         fi
         
-        if [ "$FRONTEND_EXTERNAL_IP_VALUE" != "CHANGE_ME_FRONTEND_IP" ] && [ ! -z "$FRONTEND_EXTERNAL_IP_VALUE" ]; then
-            sed -i.bak "s/CHANGE_ME_FRONTEND_IP/$FRONTEND_EXTERNAL_IP_VALUE/g" frontend/.env.local
+        if [ ! -z "$FRONTEND_URL" ] && [ "$FRONTEND_URL" != "http://CHANGE_ME:3005" ]; then
+            # Update NEXTAUTH_URL
+            sed -i.bak "s|NEXTAUTH_URL=.*|NEXTAUTH_URL=$FRONTEND_URL|" frontend/.env.local
+        fi
+        
+        if [ ! -z "$SERVICE_A_URL" ] && [ "$SERVICE_A_URL" != "http://CHANGE_ME:8004" ]; then
+            # Update NEXT_PUBLIC_SERVICE_A_URL
+            sed -i.bak "s|NEXT_PUBLIC_SERVICE_A_URL=.*|NEXT_PUBLIC_SERVICE_A_URL=$SERVICE_A_URL|" frontend/.env.local
+        fi
+        
+        if [ ! -z "$CONSENT_STORE_URL" ] && [ "$CONSENT_STORE_URL" != "http://CHANGE_ME:8001" ]; then
+            # Update NEXT_PUBLIC_CONSENT_STORE_URL
+            sed -i.bak "s|NEXT_PUBLIC_CONSENT_STORE_URL=.*|NEXT_PUBLIC_CONSENT_STORE_URL=$CONSENT_STORE_URL|" frontend/.env.local
+        fi
+        
+        if [ ! -z "$HELLO_SERVICE_URL" ] && [ "$HELLO_SERVICE_URL" != "http://CHANGE_ME:8003" ]; then
+            # Update NEXT_PUBLIC_HELLO_SERVICE_URL
+            sed -i.bak "s|NEXT_PUBLIC_HELLO_SERVICE_URL=.*|NEXT_PUBLIC_HELLO_SERVICE_URL=$HELLO_SERVICE_URL|" frontend/.env.local
         fi
         
         rm -f frontend/.env.local.bak
-        
-        if [ "$EXTERNAL_IP_VALUE" != "CHANGE_ME_IP" ] || [ "$FRONTEND_EXTERNAL_IP_VALUE" != "CHANGE_ME_FRONTEND_IP" ]; then
-            echo "✅ Frontend configuration updated!"
-        else
-            echo "⚠️  Frontend .env.local still contains placeholder values."
-            echo "   Please configure external IPs first or edit frontend/.env.local manually."
-        fi
+        echo "✅ Frontend configuration updated!"
     else
         echo "⚠️  Frontend .env.local contains placeholder values."
-        echo "   Please edit frontend/.env.local manually to replace CHANGE_ME_* values."
+        echo "   Please edit frontend/.env.local manually to configure service URLs."
     fi
 else
     echo "⚠️  Frontend .env.local not found. Please create it from frontend/.env.local.example"

@@ -4,6 +4,7 @@ import requests
 import json
 import time
 import sys
+import os
 
 def get_admin_token(keycloak_url, username='admin', password='admin'):
     """Get admin access token from Keycloak"""
