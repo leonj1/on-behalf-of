@@ -57,6 +57,7 @@ This document tracks the progress of removing hardcoded IP addresses, localhost 
 - [x] Replace hardcoded ports with environment variables
 - [x] Add environment variable configuration for each service
 - [x] Update service dependencies and links
+- [x] Remove hardcoded IP fallbacks from environment variables
 
 ### Makefile
 - [x] Already uses environment variables properly
