@@ -51,6 +51,12 @@ setup-clients:
 	@./update-nextjs-client.sh
 	@echo ""
 	@echo "Syncing frontend client secret..."
+	@if [ ! -f frontend/.env.local ]; then \
+		if [ -f frontend/.env.local.example ]; then \
+			cp frontend/.env.local.example frontend/.env.local; \
+			echo "✓ Created frontend/.env.local from example"; \
+		fi \
+	fi
 	@./update-frontend-secret.sh
 	@echo "----------------------------------------"
 	@echo "✓ All clients created successfully"

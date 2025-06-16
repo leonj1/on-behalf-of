@@ -174,6 +174,17 @@ fi
 # Configure frontend environment
 echo
 echo "Configuring frontend environment..."
+
+# Create frontend/.env.local if it doesn't exist
+if [ ! -f frontend/.env.local ]; then
+    if [ -f frontend/.env.local.example ]; then
+        cp frontend/.env.local.example frontend/.env.local
+        echo "✅ Created frontend/.env.local from frontend/.env.local.example"
+    else
+        echo "⚠️  Warning: frontend/.env.local.example not found"
+    fi
+fi
+
 if [ -f frontend/.env.local ]; then
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         # Update frontend .env.local with the service URLs from .env
