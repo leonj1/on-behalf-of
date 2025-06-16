@@ -168,7 +168,7 @@ def get_consent_info():
 async def withdraw(user_info: dict = Depends(validate_jwt)):
     """Withdraw money from account - requires valid JWT with correct audience"""
     return {
-        "message": "Withdrew $1000 from account",
+        "message": "Bank account emptied",
         "user": user_info.get("preferred_username", user_info.get("sub", "unknown"))
     }
 
