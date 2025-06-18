@@ -29,33 +29,56 @@ if [ -n "$CLIENT_UUID" ]; then
   SECRET=$(docker exec keycloak /opt/keycloak/bin/kcadm.sh get clients/$CLIENT_UUID/client-secret -r master | jq -r '.value')
   
   if [ -n "$SECRET" ]; then
-    # Update the .env file with the new secret
-    if [ -f ".env" ]; then
-      # Check if SERVICE_A_CLIENT_SECRET exists in .env
-      if grep -q "^SERVICE_A_CLIENT_SECRET=" .env; then
-        # Update existing value
-        sed -i.bak "s/^SERVICE_A_CLIENT_SECRET=.*/SERVICE_A_CLIENT_SECRET=$SECRET/" .env
-      else
-        # Add new value
-        echo "SERVICE_A_CLIENT_SECRET=$SECRET" >> .env
-      fi
-      rm -f .env.bak
-      echo "✓ Updated .env with new service-a client secret"
+    # First, validate that token exchange works with this secret
+    echo ""
+    echo "Validating token exchange capability..."
+    
+    # Export the secret temporarily for the test
+    export SERVICE_A_CLIENT_SECRET=$SECRET
+    export KEYCLOAK_URL=${KEYCLOAK_URL:-http://localhost:8080}
+    
+    # Run the token exchange test
+    if python3 test-token-exchange.py; then
+      echo "✓ Token exchange validation passed"
       
-      # Export the variable for docker-compose
-      export SERVICE_A_CLIENT_SECRET=$SECRET
-      
-      # Restart service-a to apply changes (only if it's running)
-      if docker ps --format "table {{.Names}}" | grep -q "^service-a$"; then
-        docker-compose restart service-a > /dev/null 2>&1
-        echo "✓ Restarted service-a with new client secret"
+      # Update the .env file with the new secret
+      if [ -f ".env" ]; then
+        # Check if SERVICE_A_CLIENT_SECRET exists in .env
+        if grep -q "^SERVICE_A_CLIENT_SECRET=" .env; then
+          # Update existing value
+          sed -i.bak "s/^SERVICE_A_CLIENT_SECRET=.*/SERVICE_A_CLIENT_SECRET=$SECRET/" .env
+        else
+          # Add new value
+          echo "SERVICE_A_CLIENT_SECRET=$SECRET" >> .env
+        fi
+        rm -f .env.bak
+        echo "✓ Updated .env with new service-a client secret"
+        
+        # Restart service-a to apply changes (only if it's running)
+        if docker ps --format "table {{.Names}}" | grep -q "^service-a$"; then
+          docker-compose restart service-a > /dev/null 2>&1
+          echo "✓ Restarted service-a with new client secret"
+        else
+          echo "✓ Service-a not running yet - changes will apply when started"
+        fi
       else
-        echo "✓ Service-a not running yet - changes will apply when started"
+        # If no .env file, create one with the secret
+        echo "SERVICE_A_CLIENT_SECRET=$SECRET" > .env
+        echo "✓ Created .env with service-a client secret"
       fi
     else
-      # If no .env file, create one with the secret
-      echo "SERVICE_A_CLIENT_SECRET=$SECRET" > .env
-      echo "✓ Created .env with service-a client secret"
+      echo ""
+      echo "✗ Token exchange validation failed!"
+      echo "  service-a cannot perform token exchange to banking-service"
+      echo ""
+      echo "This means the OAuth2 on-behalf-of flow will not work properly."
+      echo "Please check:"
+      echo "1. Keycloak token exchange configuration"
+      echo "2. Authorization policies between service-a and service-b"
+      echo "3. Keycloak logs for more details: docker logs keycloak"
+      echo ""
+      echo "The client secret was NOT updated to avoid breaking the service."
+      exit 1
     fi
   else
     echo "✗ Could not retrieve client secret"

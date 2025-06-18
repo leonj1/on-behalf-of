@@ -86,6 +86,9 @@ setup-clients:
 	@echo ""
 	@echo "Configuring client-level token exchange..."
 	@./configure-keycloak-token-exchange.sh
+	@echo ""
+	@echo "Applying comprehensive token exchange fixes..."
+	@./fix-token-exchange.sh
 	@echo "----------------------------------------"
 	@echo "✓ All clients created and secrets synchronized"
 

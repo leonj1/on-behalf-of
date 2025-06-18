@@ -18,7 +18,7 @@ services:
       - KC_HOSTNAME_STRICT_BACKCHANNEL=false
     ports:
       - "${KEYCLOAK_PORT:-8080}:8080"
-    command: start-dev
+    command: start-dev --features=token-exchange
     # Healthcheck removed - curl not available in container
     # Health is checked from host in Makefile instead
     networks:
