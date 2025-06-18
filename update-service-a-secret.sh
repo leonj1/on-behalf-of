@@ -29,10 +29,24 @@ if [ -n "$CLIENT_UUID" ]; then
   SECRET=$(docker exec keycloak /opt/keycloak/bin/kcadm.sh get clients/$CLIENT_UUID/client-secret -r master | jq -r '.value')
   
   if [ -n "$SECRET" ]; then
+    # Validate that token exchange works with this secret
     echo ""
-    echo "⚠️  Skipping token exchange validation for faster setup"
-    echo "   The demo will use direct JWT validation for service-to-service calls"
-    echo "   This provides the same on-behalf-of functionality"
+    echo "Validating token exchange capability..."
+    
+    # Export the secret temporarily for the test
+    export SERVICE_A_CLIENT_SECRET=$SECRET
+    export KEYCLOAK_URL=${KEYCLOAK_URL:-http://localhost:8080}
+    
+    # Run the token exchange test
+    TOKEN_EXCHANGE_WORKS=false
+    if python3 test-token-exchange.py; then
+      echo "✓ Token exchange validation passed"
+      TOKEN_EXCHANGE_WORKS=true
+    else
+      echo "⚠️  Token exchange validation failed, but continuing anyway"
+      echo "   The demo can still work with direct JWT validation"
+      TOKEN_EXCHANGE_WORKS=false
+    fi
     
     # Always proceed with client secret update
     # Update the .env file with the new secret

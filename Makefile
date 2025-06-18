@@ -72,6 +72,9 @@ setup-clients:
 	@echo "Updating nextjs-app redirect URIs..."
 	@./update-nextjs-client.sh
 	@echo ""
+	@echo "Fixing token exchange permissions..."
+	@./fix-token-exchange-permissions.sh
+	@echo ""
 	@echo "Updating frontend client secret..."
 	@./update-frontend-secret.sh
 	@echo ""
