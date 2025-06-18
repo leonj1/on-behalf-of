@@ -80,24 +80,6 @@ setup-clients:
 	@echo ""
 	@echo "Updating service-b client secret..."
 	@./update-service-b-secret.sh
-	@echo ""
-	@echo "Enabling realm-level token exchange..."
-	@./enable-realm-token-exchange.sh
-	@echo ""
-	@echo "Configuring client-level token exchange..."
-	@./configure-keycloak-token-exchange.sh
-	@echo ""
-	@echo "Applying comprehensive token exchange fixes..."
-	@./fix-token-exchange.sh
-	@echo ""
-	@echo "Setting up token exchange permissions..."
-	@./enable-token-exchange-permissions.sh
-	@echo ""
-	@echo "Creating token exchange policy..."
-	@./create-token-exchange-policy.sh
-	@echo ""
-	@echo "Granting final token exchange permissions..."
-	@./grant-token-exchange.sh
 	@echo "----------------------------------------"
 	@echo "✓ All clients created and secrets synchronized"
 
