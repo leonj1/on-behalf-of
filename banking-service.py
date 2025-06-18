@@ -76,11 +76,17 @@ async def validate_jwt(credentials: HTTPAuthorizationCredentials = Depends(secur
         # Also accept nextjs-app since frontend tokens have that audience
         accepted_audiences = [SERVICE_AUDIENCE, "service-a", "account", "nextjs-app"]  # Include common audiences
         
-        if not any(aud in audience for aud in accepted_audiences):
+        # Find which audience(s) matched
+        matched_audiences = [aud for aud in audience if aud in accepted_audiences]
+        
+        if not matched_audiences:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Invalid audience. Expected one of {accepted_audiences}, got {audience}"
             )
+        
+        # Log the accepted audience(s)
+        print(f"JWT validation successful - Audience(s) in token: {audience}, Matched: {matched_audiences}")
         
         # In production, verify the token with proper public key
         # For now, we'll trust the token if audience is correct
