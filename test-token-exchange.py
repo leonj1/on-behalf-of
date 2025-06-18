@@ -84,14 +84,14 @@ def main():
     print("✓ Got service account token")
     print("")
     
-    # Test token exchange to banking-service audience
-    print("2. Testing token exchange to banking-service audience...")
+    # Test token exchange to service-b audience (the actual client ID in Keycloak)
+    print("2. Testing token exchange to service-b audience...")
     success = test_token_exchange(
         keycloak_url, 
         client_id, 
         client_secret, 
         service_token, 
-        'banking-service'
+        'service-b'
     )
     
     if not success:
@@ -99,13 +99,14 @@ def main():
         print("Token exchange is not working. Possible issues:")
         print("1. Token exchange may not be enabled for service-a client")
         print("2. Authorization policies may not be configured correctly")
-        print("3. The target audience (banking-service) may not exist")
+        print("3. The target audience (service-b) may not exist as a client")
         print("4. Keycloak version may require different configuration")
+        print("5. Token exchange feature flag may not be enabled in Keycloak")
         sys.exit(1)
     
     print("")
     print("✓ Token exchange validation successful!")
-    print("  service-a can exchange tokens for banking-service audience")
+    print("  service-a can exchange tokens for service-b audience")
     sys.exit(0)
 
 if __name__ == '__main__':

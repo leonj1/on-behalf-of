@@ -100,13 +100,13 @@ if [ -n "$SERVICE_A_UUID" ]; then
     if [ -n "$ACCESS_TOKEN" ]; then
       echo "  ✓ Got service account token"
       
-      echo "  Attempting token exchange to banking-service..."
+      echo "  Attempting token exchange to service-b..."
       EXCHANGE_RESPONSE=$(curl -s -X POST http://localhost:8080/realms/master/protocol/openid-connect/token \
         -d "grant_type=urn:ietf:params:oauth:grant-type:token-exchange" \
         -d "subject_token=$ACCESS_TOKEN" \
         -d "subject_token_type=urn:ietf:params:oauth:token-type:access_token" \
         -d "requested_token_type=urn:ietf:params:oauth:token-type:access_token" \
-        -d "audience=banking-service" \
+        -d "audience=service-b" \
         -d "client_id=service-a" \
         -d "client_secret=$SECRET" 2>/dev/null || echo "{}")
       

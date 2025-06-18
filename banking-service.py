@@ -38,7 +38,7 @@ security = HTTPBearer()
 # Configuration
 KEYCLOAK_URL = KEYCLOAK_INTERNAL_URL
 REALM = KEYCLOAK_REALM
-SERVICE_AUDIENCE = "banking-service"
+SERVICE_AUDIENCE = "service-b"  # This must match the client ID in Keycloak
 
 async def get_keycloak_public_key():
     """Fetch Keycloak public key for JWT validation"""
@@ -72,7 +72,7 @@ async def validate_jwt(credentials: HTTPAuthorizationCredentials = Depends(secur
         if isinstance(audience, str):
             audience = [audience]
         
-        # Accept tokens for banking-service OR service-a (when called through service-a)
+        # Accept tokens for service-b (this service's client ID) OR service-a (when called through service-a)
         # Also accept nextjs-app since frontend tokens have that audience
         accepted_audiences = [SERVICE_AUDIENCE, "service-a", "account", "nextjs-app"]  # Include common audiences
         

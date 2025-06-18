@@ -230,8 +230,8 @@ async def withdraw(user_info: dict = Depends(get_user_info)):
             }
         )
     
-    # Exchange token for one with banking-service audience
-    exchanged_token = await exchange_token_for_audience(token, "banking-service")
+    # Exchange token for one with service-b audience (the actual client ID in Keycloak)
+    exchanged_token = await exchange_token_for_audience(token, "service-b")
     
     if not exchanged_token:
         # If token exchange fails, try using the original token
