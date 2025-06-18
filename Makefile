@@ -89,6 +89,15 @@ setup-clients:
 	@echo ""
 	@echo "Applying comprehensive token exchange fixes..."
 	@./fix-token-exchange.sh
+	@echo ""
+	@echo "Setting up token exchange permissions..."
+	@./enable-token-exchange-permissions.sh
+	@echo ""
+	@echo "Creating token exchange policy..."
+	@./create-token-exchange-policy.sh
+	@echo ""
+	@echo "Granting final token exchange permissions..."
+	@./grant-token-exchange.sh
 	@echo "----------------------------------------"
 	@echo "✓ All clients created and secrets synchronized"
 
