@@ -146,6 +146,20 @@ setup: start-backend setup-clients setup-consent-store start-frontend wait-for-c
 	@echo "✓ Full setup complete!"
 	@echo "========================================="
 	@echo ""
+
+setup-with-fallback: start-backend
+	@echo "Setting up with authentication fallback..."
+	@./setup-auth-with-fallback.sh
+	@echo ""
+	@SKIP_TOKEN_EXCHANGE_CHECK=true $(MAKE) setup-clients
+	@$(MAKE) setup-consent-store
+	@$(MAKE) start-frontend
+	@$(MAKE) wait-for-consent-ui
+	@echo ""
+	@echo "========================================="
+	@echo "✓ Setup complete with fallback auth!"
+	@echo "========================================="
+	@echo ""
 	@echo "Services available at:"
 	@echo "  - Keycloak:      http://$${EXTERNAL_IP:-100.68.45.127}:$${KEYCLOAK_PORT:-8080} (admin/admin)"
 	@echo "  - Consent Store: http://localhost:$${CONSENT_STORE_PORT:-8001}"

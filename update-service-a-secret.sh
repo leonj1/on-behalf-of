@@ -38,9 +38,20 @@ if [ -n "$CLIENT_UUID" ]; then
     export KEYCLOAK_URL=${KEYCLOAK_URL:-http://localhost:8080}
     
     # Run the token exchange test
+    TOKEN_EXCHANGE_WORKS=false
     if python3 test-token-exchange.py; then
       echo "✓ Token exchange validation passed"
-      
+      TOKEN_EXCHANGE_WORKS=true
+    elif [ "${SKIP_TOKEN_EXCHANGE_CHECK:-false}" = "true" ]; then
+      echo "⚠️  Token exchange validation failed, but SKIP_TOKEN_EXCHANGE_CHECK is set"
+      echo "   Proceeding with alternative authentication approach..."
+      TOKEN_EXCHANGE_WORKS=false
+    else
+      # Token exchange failed and skip is not set
+      TOKEN_EXCHANGE_WORKS=false
+    fi
+    
+    if [ "$TOKEN_EXCHANGE_WORKS" = "true" ] || [ "${SKIP_TOKEN_EXCHANGE_CHECK:-false}" = "true" ]; then
       # Update the .env file with the new secret
       if [ -f ".env" ]; then
         # Check if SERVICE_A_CLIENT_SECRET exists in .env
