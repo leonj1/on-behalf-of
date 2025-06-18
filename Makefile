@@ -80,6 +80,9 @@ setup-clients:
 	@echo ""
 	@echo "Updating service-b client secret..."
 	@./update-service-b-secret.sh
+	@echo ""
+	@echo "Configuring token exchange..."
+	@./configure-token-exchange.sh
 	@echo "----------------------------------------"
 	@echo "✓ All clients created and secrets synchronized"
 

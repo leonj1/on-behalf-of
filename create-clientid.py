@@ -48,7 +48,9 @@ def create_client(keycloak_url, realm, client_id, token):
         'authorizationServicesEnabled': False,
         'attributes': {
             'use.refresh.tokens': 'true',
-            'client.secret.creation.time': str(int(time.time()))
+            'client.secret.creation.time': str(int(time.time())),
+            'token.exchange.grant.enabled': 'true',
+            'token-exchange-permissions-enabled': 'true'
         }
     }
     
