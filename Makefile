@@ -74,8 +74,14 @@ setup-clients:
 	@echo ""
 	@echo "Updating frontend client secret..."
 	@./update-frontend-secret.sh
+	@echo ""
+	@echo "Updating service-a client secret..."
+	@./update-service-a-secret.sh
+	@echo ""
+	@echo "Updating service-b client secret..."
+	@./update-service-b-secret.sh
 	@echo "----------------------------------------"
-	@echo "✓ All clients created successfully"
+	@echo "✓ All clients created and secrets synchronized"
 
 setup-consent-store:
 	@echo "Setting up consent store applications..."
